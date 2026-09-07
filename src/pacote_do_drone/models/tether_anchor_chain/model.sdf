@@ -209,11 +209,15 @@
       <child>tether_link_5</child>
     </joint>
     <plugin filename="libTetherForceConstraint.so" name="drone_cabo::TetherForceConstraint">
-      <drone_model>x500_0</drone_model>
-      <drone_link>base_link</drone_link>
+      <drone_model>x500_tether_attach_0</drone_model>
+      <drone_link>tether_attach_link</drone_link>
       <tether_model>tether_anchor_chain</tether_model>
       <tether_link>tether_link_5</tether_link>
-      <drone_offset>0 0 -0.12</drone_offset>
+      <!-- Reservado: o plugin NAO le este campo. A instrumentacao direta do
+           wrench em anchor_world_fixed via EnableTransmittedWrenchCheck
+           derruba o backend DART (BallJoint::updateRelativeTransform). -->
+      <anchor_joint>anchor_world_fixed</anchor_joint>
+      <drone_offset>0 0 0</drone_offset>
       <tether_offset>0.5 0 0</tether_offset>
       <stiffness>5</stiffness>
       <damping>0.5</damping>

@@ -214,6 +214,10 @@ def force_constraint_plugin_xml(
       <drone_link>{drone_link}</drone_link>
       <tether_model>tether_anchor_chain</tether_model>
       <tether_link>tether_link_{n_links}</tether_link>
+      <!-- Reservado: o plugin NAO le este campo. A instrumentacao direta do
+           wrench em anchor_world_fixed via EnableTransmittedWrenchCheck
+           derruba o backend DART (BallJoint::updateRelativeTransform). -->
+      <anchor_joint>anchor_world_fixed</anchor_joint>
       <drone_offset>{drone_offset}</drone_offset>
       <tether_offset>{tether_offset}</tether_offset>
       <stiffness>{stiffness:.9g}</stiffness>
@@ -360,9 +364,9 @@ def main():
     parser.add_argument('--initial-axis', choices=('x', 'z', 'folded_ground'), default='z')
     parser.add_argument('--link-collisions', action='store_true')
     parser.add_argument('--force-constraint', action='store_true')
-    parser.add_argument('--drone-model', default='x500_0')
-    parser.add_argument('--drone-link', default='base_link')
-    parser.add_argument('--drone-offset', default='0 0 -0.12')
+    parser.add_argument('--drone-model', default='x500_tether_attach_0')
+    parser.add_argument('--drone-link', default='tether_attach_link')
+    parser.add_argument('--drone-offset', default='0 0 0')
     parser.add_argument('--stiffness', type=float, default=20.0)
     parser.add_argument('--damping', type=float, default=4.0)
     parser.add_argument('--max-force', type=float, default=20.0)

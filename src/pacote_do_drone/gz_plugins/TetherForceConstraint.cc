@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <memory>
 #include <string>
 
@@ -29,11 +30,11 @@ class TetherForceConstraint:
       gz::sim::EntityComponentManager &,
       gz::sim::EventManager &) override
   {
-    this->droneModel = this->Read<std::string>(_sdf, "drone_model", "x500_0");
-    this->droneLinkName = this->Read<std::string>(_sdf, "drone_link", "base_link");
+    this->droneModel = this->Read<std::string>(_sdf, "drone_model", "x500_tether_attach_0");
+    this->droneLinkName = this->Read<std::string>(_sdf, "drone_link", "tether_attach_link");
     this->tetherModel = this->Read<std::string>(_sdf, "tether_model", "tether_anchor_chain");
     this->tetherLinkName = this->Read<std::string>(_sdf, "tether_link", "tether_link_5");
-    this->droneOffset = this->ReadVector(_sdf, "drone_offset", gz::math::Vector3d(0, 0, -0.12));
+    this->droneOffset = this->ReadVector(_sdf, "drone_offset", gz::math::Vector3d(0, 0, 0));
     this->tetherOffset = this->ReadVector(_sdf, "tether_offset", gz::math::Vector3d(0, 0, -0.5));
     this->stiffness = this->Read<double>(_sdf, "stiffness", 20.0);
     this->damping = this->Read<double>(_sdf, "damping", 4.0);
@@ -41,6 +42,7 @@ class TetherForceConstraint:
     this->forcePub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/force");
     this->errorPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/error");
     this->statsPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/stats");
+    this->anchorStatsPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/anchor/stats");
   }
 
   public: void PreUpdate(
@@ -74,6 +76,9 @@ class TetherForceConstraint:
     }
     const double forceNorm = forceOnTether.Length();
 
+    // AddWorldForce(_ecm, F, p) aplica F no ponto p expresso no frame do link e
+    // deriva sozinho o momento r x F em torno do CoM daquele link. Nao adicionar
+    // torque manualmente aqui: isso contaria o braco de alavanca duas vezes.
     this->tetherLink.AddWorldForce(_ecm, forceOnTether, this->tetherOffset);
     this->droneLink.AddWorldForce(_ecm, -forceOnTether, this->droneOffset);
 
@@ -94,6 +99,8 @@ class TetherForceConstraint:
     statsMsg.set_y(forceNorm);
     statsMsg.set_z(saturated ? 1.0 : 0.0);
     this->statsPub.Publish(statsMsg);
+
+    this->PublishAnchorUnavailable();
   }
 
   private: template <typename T>
@@ -135,6 +142,20 @@ class TetherForceConstraint:
     return links.front();
   }
 
+  // O wrench transmitido pela ancora nao e observavel nesta configuracao:
+  // habilitar Joint::EnableTransmittedWrenchCheck em anchor_world_fixed derruba o
+  // backend DART (BallJoint::updateRelativeTransform). Publicamos entao x=|F| e
+  // y=|M| como NaN (medida ausente, nunca 0 N) e z=0 como flag de disponibilidade.
+  private: void PublishAnchorUnavailable()
+  {
+    const double unavailable = std::numeric_limits<double>::quiet_NaN();
+    gz::msgs::Vector3d statsMsg;
+    statsMsg.set_x(unavailable);
+    statsMsg.set_y(unavailable);
+    statsMsg.set_z(0.0);
+    this->anchorStatsPub.Publish(statsMsg);
+  }
+
   private: bool ResolveLinks(gz::sim::EntityComponentManager &_ecm)
   {
     if (!this->resolved)
@@ -152,11 +173,11 @@ class TetherForceConstraint:
     return true;
   }
 
-  private: std::string droneModel{"x500_0"};
-  private: std::string droneLinkName{"base_link"};
+  private: std::string droneModel{"x500_tether_attach_0"};
+  private: std::string droneLinkName{"tether_attach_link"};
   private: std::string tetherModel{"tether_anchor_chain"};
   private: std::string tetherLinkName{"tether_link_5"};
-  private: gz::math::Vector3d droneOffset{0, 0, -0.12};
+  private: gz::math::Vector3d droneOffset{0, 0, 0};
   private: gz::math::Vector3d tetherOffset{0, 0, -0.5};
   private: double stiffness{20.0};
   private: double damping{4.0};
@@ -168,6 +189,7 @@ class TetherForceConstraint:
   private: gz::transport::Node::Publisher forcePub;
   private: gz::transport::Node::Publisher errorPub;
   private: gz::transport::Node::Publisher statsPub;
+  private: gz::transport::Node::Publisher anchorStatsPub;
 };
 }
 
