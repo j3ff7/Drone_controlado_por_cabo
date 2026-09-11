@@ -41,3 +41,47 @@ def test_mean_tail_uses_only_the_last_samples_of_the_phase():
     rows.append({'phase': 'translate_out', 'x': '99'})
 
     assert compare.mean_tail(rows, 'climb_hover', 'x', count=2) == 8.5
+
+
+def test_offboard_flag_tolerates_heartbeat_lag_at_mode_acquisition(tmp_path):
+    # O heartbeat chega a ~1 Hz e os setpoints a 20 Hz: as primeiras amostras de voo
+    # podem carregar o modo anterior sem que OFFBOARD tenha falhado.
+    import csv
+
+    rows = []
+    for phase, count, mode in (('climb_hover', 1, 4 << 16), ('climb_hover', 5, 6 << 16),
+                               ('translate_out', 5, 6 << 16), ('return_home', 5, 6 << 16)):
+        for _ in range(count):
+            rows.append({'phase': phase, 'custom_mode': str(mode), 'system_status': '4',
+                         'e_xy': '0.1', 'ez': '0.1', 'roll_deg': '1', 'pitch_deg': '1',
+                         'x': '0', 'y': '0', 'z': '0'})
+
+    path = tmp_path / 'px4_offboard_horizontal_mission.csv'
+    with path.open('w', newline='') as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+
+    metrics = compare.mission_metrics(tmp_path)
+
+    assert metrics['offboard_held_during_flight'] is True
+    assert metrics['offboard_acquisition_samples'] == 1
+    assert metrics['offboard_fraction_of_flight'] == 15 / 16
+
+
+def test_offboard_flag_fails_when_mode_drops_after_acquisition(tmp_path):
+    import csv
+
+    rows = []
+    for mode in (6 << 16, 6 << 16, 4 << 16):
+        rows.append({'phase': 'translate_out', 'custom_mode': str(mode), 'system_status': '4',
+                     'e_xy': '0.1', 'ez': '0.1', 'roll_deg': '1', 'pitch_deg': '1',
+                     'x': '0', 'y': '0', 'z': '0'})
+
+    path = tmp_path / 'px4_offboard_horizontal_mission.csv'
+    with path.open('w', newline='') as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+
+    assert compare.mission_metrics(tmp_path)['offboard_held_during_flight'] is False

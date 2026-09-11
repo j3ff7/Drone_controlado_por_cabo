@@ -2,7 +2,7 @@
 <sdf version="1.9">
   <model name="tether_anchor_chain">
     <static>false</static>
-    <link name="anchor_link">
+    <link name="ground_station_base">
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <mass>1.0</mass>
@@ -15,10 +15,121 @@
           <izz>1</izz>
         </inertia>
       </inertial>
-      <visual name="anchor_visual">
+      <visual name="ground_station_base_plate">
+        <pose>0 0 0.01 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.3 0.3 0.02</size>
+          </box>
+        </geometry>
+        <material>
+          <diffuse>0.20 0.22 0.26 1.0</diffuse>
+          <ambient>0.20 0.22 0.26 1.0</ambient>
+        </material>
+      </visual>
+      <visual name="ground_station_base_post_left">
+        <pose>0 0.09 0.07 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.02 0.02 0.1</size>
+          </box>
+        </geometry>
+        <material>
+          <diffuse>0.28 0.30 0.34 1.0</diffuse>
+          <ambient>0.28 0.30 0.34 1.0</ambient>
+        </material>
+      </visual>
+      <visual name="ground_station_base_post_right">
+        <pose>0 -0.09 0.07 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.02 0.02 0.1</size>
+          </box>
+        </geometry>
+        <material>
+          <diffuse>0.28 0.30 0.34 1.0</diffuse>
+          <ambient>0.28 0.30 0.34 1.0</ambient>
+        </material>
+      </visual>
+      <visual name="ground_station_base_axle">
+        <pose>0 0 0.12 1.57079632679 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.008</radius>
+            <length>0.22</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <diffuse>0.55 0.57 0.60 1.0</diffuse>
+          <ambient>0.55 0.57 0.60 1.0</ambient>
+        </material>
+      </visual>
+
+    </link>
+    <joint name="ground_station_world_fixed" type="fixed">
+      <parent>world</parent>
+      <child>ground_station_base</child>
+    </joint>
+    <link name="reel_link">
+      <pose relative_to="ground_station_base">0 0 0.12 0 0 0</pose>
+      <inertial>
+        <mass>0.2</mass>
+        <inertia>
+          <ixx>0.000671666667</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00049</iyy>
+          <iyz>0</iyz>
+          <izz>0.000671666667</izz>
+        </inertia>
+      </inertial>
+      <visual name="reel_link_visual">
+        <pose>0 0 0 1.57079632679 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.07</radius>
+            <length>0.16</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <diffuse>0.75 0.55 0.10 1.0</diffuse>
+          <ambient>0.75 0.55 0.10 1.0</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name="reel_joint" type="revolute">
+      <pose relative_to="reel_link">0 0 0 0 0 0</pose>
+      <parent>ground_station_base</parent>
+      <child>reel_link</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e16</lower>
+          <upper>1e16</upper>
+        </limit>
+        <dynamics>
+          <damping>0.005</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name="tether_exit_point">
+      <pose relative_to="ground_station_base">0 0 0.19 0 0 0</pose>
+      <inertial>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>1e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-07</iyy>
+          <iyz>0</iyz>
+          <izz>1e-07</izz>
+        </inertia>
+      </inertial>
+      <visual name="tether_exit_point_visual">
         <geometry>
           <sphere>
-            <radius>0.035</radius>
+            <radius>0.018</radius>
           </sphere>
         </geometry>
         <material>
@@ -26,38 +137,32 @@
           <ambient>0.05 0.15 0.9 1.0</ambient>
         </material>
       </visual>
-      <collision name="anchor_collision">
-        <geometry>
-          <sphere>
-            <radius>0.025</radius>
-          </sphere>
-        </geometry>
-      </collision>
     </link>
-    <joint name="anchor_world_fixed" type="fixed">
-      <parent>world</parent>
-      <child>anchor_link</child>
+    <joint name="tether_exit_fixed" type="fixed">
+      <parent>ground_station_base</parent>
+      <child>tether_exit_point</child>
     </joint>
+
     <link name="tether_link_1">
-      <pose relative_to="anchor_link">0 0 0 0 -0 0</pose>
+      <pose relative_to="tether_exit_point">0 0 0 0 0.515539081 0</pose>
       <inertial>
-        <pose>0.25 0 0 0 1.57079632679 0</pose>
-        <mass>0.03</mass>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <mass>0.015</mass>
         <inertia>
-          <ixx>1.35e-07</ixx>
+          <ixx>6.75e-08</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.0006250675</iyy>
+          <iyy>7.815875e-05</iyy>
           <iyz>0</iyz>
-          <izz>0.0006250675</izz>
+          <izz>7.815875e-05</izz>
         </inertia>
       </inertial>
       <visual name="tether_link_1_visual">
-        <pose>0.25 0 0 0 1.57079632679 0</pose>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
         <geometry>
           <cylinder>
             <radius>0.003</radius>
-            <length>0.5</length>
+            <length>0.25</length>
           </cylinder>
         </geometry>
         <material>
@@ -66,32 +171,63 @@
         </material>
       </visual>
 
+      <collision name="tether_link_1_collision">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.00225</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+      </collision>
     </link>
-    <joint name="tether_joint_1" type="ball">
-      <pose relative_to="anchor_link">0 0 0 0 0 0</pose>
-      <parent>anchor_link</parent>
+    <joint name="tether_joint_1" type="universal">
+      <pose relative_to="tether_exit_point">0 0 0 0 0 0</pose>
+      <parent>tether_exit_point</parent>
       <child>tether_link_1</child>
+      <axis>
+        <xyz expressed_in="tether_link_1">0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <axis2>
+        <xyz expressed_in="tether_link_1">0 -0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis2>
     </joint>
     <link name="tether_link_2">
-      <pose relative_to="tether_link_1">0.5 0 0 0 -0 1.88495559</pose>
+      <pose relative_to="tether_link_1">0.25 0 0 0 -0.106825735 0</pose>
       <inertial>
-        <pose>0.25 0 0 0 1.57079632679 0</pose>
-        <mass>0.03</mass>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <mass>0.015</mass>
         <inertia>
-          <ixx>1.35e-07</ixx>
+          <ixx>6.75e-08</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.0006250675</iyy>
+          <iyy>7.815875e-05</iyy>
           <iyz>0</iyz>
-          <izz>0.0006250675</izz>
+          <izz>7.815875e-05</izz>
         </inertia>
       </inertial>
       <visual name="tether_link_2_visual">
-        <pose>0.25 0 0 0 1.57079632679 0</pose>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
         <geometry>
           <cylinder>
             <radius>0.003</radius>
-            <length>0.5</length>
+            <length>0.25</length>
           </cylinder>
         </geometry>
         <material>
@@ -100,32 +236,63 @@
         </material>
       </visual>
 
+      <collision name="tether_link_2_collision">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.00225</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+      </collision>
     </link>
-    <joint name="tether_joint_2" type="ball">
-      <pose relative_to="tether_link_1">0.5 0 0 0 0 0</pose>
+    <joint name="tether_joint_2" type="universal">
+      <pose relative_to="tether_link_1">0.25 0 0 0 0 0</pose>
       <parent>tether_link_1</parent>
       <child>tether_link_2</child>
+      <axis>
+        <xyz expressed_in="tether_link_2">0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <axis2>
+        <xyz expressed_in="tether_link_2">0 -0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis2>
     </joint>
     <link name="tether_link_3">
-      <pose relative_to="tether_link_2">0.5 0 0 0 -0 2.51327412</pose>
+      <pose relative_to="tether_link_2">0.25 0 0 0 -0.106825735 0</pose>
       <inertial>
-        <pose>0.25 0 0 0 1.57079632679 0</pose>
-        <mass>0.03</mass>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <mass>0.015</mass>
         <inertia>
-          <ixx>1.35e-07</ixx>
+          <ixx>6.75e-08</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.0006250675</iyy>
+          <iyy>7.815875e-05</iyy>
           <iyz>0</iyz>
-          <izz>0.0006250675</izz>
+          <izz>7.815875e-05</izz>
         </inertia>
       </inertial>
       <visual name="tether_link_3_visual">
-        <pose>0.25 0 0 0 1.57079632679 0</pose>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
         <geometry>
           <cylinder>
             <radius>0.003</radius>
-            <length>0.5</length>
+            <length>0.25</length>
           </cylinder>
         </geometry>
         <material>
@@ -134,32 +301,63 @@
         </material>
       </visual>
 
+      <collision name="tether_link_3_collision">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.00225</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+      </collision>
     </link>
-    <joint name="tether_joint_3" type="ball">
-      <pose relative_to="tether_link_2">0.5 0 0 0 0 0</pose>
+    <joint name="tether_joint_3" type="universal">
+      <pose relative_to="tether_link_2">0.25 0 0 0 0 0</pose>
       <parent>tether_link_2</parent>
       <child>tether_link_3</child>
+      <axis>
+        <xyz expressed_in="tether_link_3">0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <axis2>
+        <xyz expressed_in="tether_link_3">0 -0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis2>
     </joint>
     <link name="tether_link_4">
-      <pose relative_to="tether_link_3">0.5 0 0 0 -0.0851026884 -2.63456316</pose>
+      <pose relative_to="tether_link_3">0.25 0 0 0 -0.106825735 0</pose>
       <inertial>
-        <pose>0.25 0 0 0 1.57079632679 0</pose>
-        <mass>0.03</mass>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <mass>0.015</mass>
         <inertia>
-          <ixx>1.35e-07</ixx>
+          <ixx>6.75e-08</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.0006250675</iyy>
+          <iyy>7.815875e-05</iyy>
           <iyz>0</iyz>
-          <izz>0.0006250675</izz>
+          <izz>7.815875e-05</izz>
         </inertia>
       </inertial>
       <visual name="tether_link_4_visual">
-        <pose>0.25 0 0 0 1.57079632679 0</pose>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
         <geometry>
           <cylinder>
             <radius>0.003</radius>
-            <length>0.5</length>
+            <length>0.25</length>
           </cylinder>
         </geometry>
         <material>
@@ -168,32 +366,388 @@
         </material>
       </visual>
 
+      <collision name="tether_link_4_collision">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.00225</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+      </collision>
     </link>
-    <joint name="tether_joint_4" type="ball">
-      <pose relative_to="tether_link_3">0.5 0 0 0 0 0</pose>
+    <joint name="tether_joint_4" type="universal">
+      <pose relative_to="tether_link_3">0.25 0 0 0 0 0</pose>
       <parent>tether_link_3</parent>
       <child>tether_link_4</child>
+      <axis>
+        <xyz expressed_in="tether_link_4">0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <axis2>
+        <xyz expressed_in="tether_link_4">0 -0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis2>
     </joint>
     <link name="tether_link_5">
-      <pose relative_to="tether_link_4">0.5 0 0 0.0324209143 -0.163894326 2.75182278</pose>
+      <pose relative_to="tether_link_4">0.25 0 0 0 -0.106825735 0</pose>
       <inertial>
-        <pose>0.25 0 0 0 1.57079632679 0</pose>
-        <mass>0.03</mass>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <mass>0.015</mass>
         <inertia>
-          <ixx>1.35e-07</ixx>
+          <ixx>6.75e-08</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.0006250675</iyy>
+          <iyy>7.815875e-05</iyy>
           <iyz>0</iyz>
-          <izz>0.0006250675</izz>
+          <izz>7.815875e-05</izz>
         </inertia>
       </inertial>
       <visual name="tether_link_5_visual">
-        <pose>0.25 0 0 0 1.57079632679 0</pose>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
         <geometry>
           <cylinder>
             <radius>0.003</radius>
-            <length>0.5</length>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <diffuse>0.02 0.02 0.02 1.0</diffuse>
+          <ambient>0.02 0.02 0.02 1.0</ambient>
+        </material>
+      </visual>
+
+      <collision name="tether_link_5_collision">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.00225</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="tether_joint_5" type="universal">
+      <pose relative_to="tether_link_4">0.25 0 0 0 0 0</pose>
+      <parent>tether_link_4</parent>
+      <child>tether_link_5</child>
+      <axis>
+        <xyz expressed_in="tether_link_5">0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <axis2>
+        <xyz expressed_in="tether_link_5">0 -0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis2>
+    </joint>
+    <link name="tether_link_6">
+      <pose relative_to="tether_link_5">0.25 0 0 0 -0.106825735 0</pose>
+      <inertial>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>6.75e-08</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>7.815875e-05</iyy>
+          <iyz>0</iyz>
+          <izz>7.815875e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name="tether_link_6_visual">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.003</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <diffuse>0.02 0.02 0.02 1.0</diffuse>
+          <ambient>0.02 0.02 0.02 1.0</ambient>
+        </material>
+      </visual>
+
+      <collision name="tether_link_6_collision">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.00225</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="tether_joint_6" type="universal">
+      <pose relative_to="tether_link_5">0.25 0 0 0 0 0</pose>
+      <parent>tether_link_5</parent>
+      <child>tether_link_6</child>
+      <axis>
+        <xyz expressed_in="tether_link_6">0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <axis2>
+        <xyz expressed_in="tether_link_6">0 -0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis2>
+    </joint>
+    <link name="tether_link_7">
+      <pose relative_to="tether_link_6">0.25 0 0 0 -0.106825735 0</pose>
+      <inertial>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>6.75e-08</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>7.815875e-05</iyy>
+          <iyz>0</iyz>
+          <izz>7.815875e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name="tether_link_7_visual">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.003</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <diffuse>0.02 0.02 0.02 1.0</diffuse>
+          <ambient>0.02 0.02 0.02 1.0</ambient>
+        </material>
+      </visual>
+
+      <collision name="tether_link_7_collision">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.00225</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="tether_joint_7" type="universal">
+      <pose relative_to="tether_link_6">0.25 0 0 0 0 0</pose>
+      <parent>tether_link_6</parent>
+      <child>tether_link_7</child>
+      <axis>
+        <xyz expressed_in="tether_link_7">0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <axis2>
+        <xyz expressed_in="tether_link_7">0 -0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis2>
+    </joint>
+    <link name="tether_link_8">
+      <pose relative_to="tether_link_7">0.25 0 0 0 -0.106825735 0</pose>
+      <inertial>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>6.75e-08</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>7.815875e-05</iyy>
+          <iyz>0</iyz>
+          <izz>7.815875e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name="tether_link_8_visual">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.003</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <diffuse>0.02 0.02 0.02 1.0</diffuse>
+          <ambient>0.02 0.02 0.02 1.0</ambient>
+        </material>
+      </visual>
+
+      <collision name="tether_link_8_collision">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.00225</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="tether_joint_8" type="universal">
+      <pose relative_to="tether_link_7">0.25 0 0 0 0 0</pose>
+      <parent>tether_link_7</parent>
+      <child>tether_link_8</child>
+      <axis>
+        <xyz expressed_in="tether_link_8">0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <axis2>
+        <xyz expressed_in="tether_link_8">0 -0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis2>
+    </joint>
+    <link name="tether_link_9">
+      <pose relative_to="tether_link_8">0.25 0 0 0 -0.106825735 0</pose>
+      <inertial>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>6.75e-08</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>7.815875e-05</iyy>
+          <iyz>0</iyz>
+          <izz>7.815875e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name="tether_link_9_visual">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.003</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <diffuse>0.02 0.02 0.02 1.0</diffuse>
+          <ambient>0.02 0.02 0.02 1.0</ambient>
+        </material>
+      </visual>
+
+      <collision name="tether_link_9_collision">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.00225</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="tether_joint_9" type="universal">
+      <pose relative_to="tether_link_8">0.25 0 0 0 0 0</pose>
+      <parent>tether_link_8</parent>
+      <child>tether_link_9</child>
+      <axis>
+        <xyz expressed_in="tether_link_9">0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <axis2>
+        <xyz expressed_in="tether_link_9">0 -0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis2>
+    </joint>
+    <link name="tether_link_10">
+      <pose relative_to="tether_link_9">0.25 0 0 0 -0.106825735 0</pose>
+      <inertial>
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>6.75e-08</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>7.815875e-05</iyy>
+          <iyz>0</iyz>
+          <izz>7.815875e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name="tether_link_10_visual">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.003</radius>
+            <length>0.25</length>
           </cylinder>
         </geometry>
         <material>
@@ -202,26 +756,70 @@
         </material>
       </visual>
 
+      <collision name="tether_link_10_collision">
+        <pose>0.125 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.00225</radius>
+            <length>0.25</length>
+          </cylinder>
+        </geometry>
+      </collision>
     </link>
-    <joint name="tether_joint_5" type="ball">
-      <pose relative_to="tether_link_4">0.5 0 0 0 0 0</pose>
-      <parent>tether_link_4</parent>
-      <child>tether_link_5</child>
+    <joint name="tether_joint_10" type="universal">
+      <pose relative_to="tether_link_9">0.25 0 0 0 0 0</pose>
+      <parent>tether_link_9</parent>
+      <child>tether_link_10</child>
+      <axis>
+        <xyz expressed_in="tether_link_10">0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <axis2>
+        <xyz expressed_in="tether_link_10">0 -0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis2>
     </joint>
     <plugin filename="libTetherForceConstraint.so" name="drone_cabo::TetherForceConstraint">
       <drone_model>x500_tether_attach_0</drone_model>
       <drone_link>tether_attach_link</drone_link>
       <tether_model>tether_anchor_chain</tether_model>
-      <tether_link>tether_link_5</tether_link>
+      <tether_link>tether_link_10</tether_link>
       <!-- Reservado: o plugin NAO le este campo. A instrumentacao direta do
-           wrench em anchor_world_fixed via EnableTransmittedWrenchCheck
-           derruba o backend DART (BallJoint::updateRelativeTransform). -->
-      <anchor_joint>anchor_world_fixed</anchor_joint>
+           wrench neste joint via EnableTransmittedWrenchCheck derruba o backend
+           DART (BallJoint::updateRelativeTransform). -->
+      <anchor_joint>ground_station_world_fixed</anchor_joint>
+      <exit_link>tether_exit_point</exit_link>
+      <reel_joint>reel_joint</reel_joint>
+      <tether_link_count>10</tether_link_count>
+      <exit_segment_link>tether_link_1</exit_segment_link>
+      <payout_link></payout_link>
       <drone_offset>0 0 0</drone_offset>
-      <tether_offset>0.5 0 0</tether_offset>
+      <tether_offset>0.25 0 0</tether_offset>
       <stiffness>5</stiffness>
       <damping>0.5</damping>
       <max_force>3</max_force>
+    </plugin>
+    <plugin filename="libReelActuator.so" name="drone_cabo::ReelActuator">
+      <reel_model>tether_anchor_chain</reel_model>
+      <reel_joint>reel_joint</reel_joint>
+      <tau_max>0.05</tau_max>
+      <omega_max>12</omega_max>
+      <ramp_rate>0.05</ramp_rate>
+      <command_topic>/cabo/tms/reel_cmd</command_topic>
     </plugin>
   </model>
 </sdf>

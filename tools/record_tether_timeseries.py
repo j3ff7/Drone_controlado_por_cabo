@@ -35,11 +35,13 @@ class Vector3dStreamParser:
 
     def __init__(self):
         self.current = {}
+        self.saw_content = False
         self.invalid_messages = 0
 
     def feed_line(self, line):
         if not line.strip():
             return self._finish()
+        self.saw_content = True
         match = VECTOR_FIELD_RE.match(line)
         if not match:
             return None
@@ -51,16 +53,23 @@ class Vector3dStreamParser:
         return finished
 
     def flush(self):
-        return self._finish()
+        return self._finish(delimited=False)
 
-    def _finish(self):
-        if not self.current:
+    def _finish(self, delimited=True):
+        """Campos ausentes valem 0: a serializacao de texto do protobuf omite zeros.
+
+        So e invalida a mensagem que ficou aberta no fim do stream. Exigir x/y
+        presentes rejeitava `theta=0, omega=0` do reel parado.
+        """
+        if not self.saw_content:
             return None
-        current, self.current = self.current, {}
-        if 'x' not in current or 'y' not in current:
+        current, self.current, self.saw_content = self.current, {}, False
+        if not delimited:
             self.invalid_messages += 1
             return None
-        return (current['x'], current['y'], current.get('z', 0.0))
+        # NaN e preservado de proposito: e como a indisponibilidade de medida chega
+        # ao CSV. Quem recusa valor nao finito e o coletor, que e o gate.
+        return (current.get('x', 0.0), current.get('y', 0.0), current.get('z', 0.0))
 
 
 class WorldStatsStreamParser:
@@ -192,6 +201,10 @@ def main():
         'force': TopicRecorder('/cabo/conexao/force', Vector3dStreamParser, stop_event),
         'stats': TopicRecorder('/cabo/conexao/stats', Vector3dStreamParser, stop_event),
         'anchor': TopicRecorder('/cabo/anchor/stats', Vector3dStreamParser, stop_event),
+        'reel': TopicRecorder('/cabo/estacao/reel_state', Vector3dStreamParser, stop_event),
+        'tensao': TopicRecorder('/cabo/estacao/tensao', Vector3dStreamParser, stop_event),
+        'exit_force': TopicRecorder('/cabo/estacao/exit_force', Vector3dStreamParser, stop_event),
+        'exit_tangent': TopicRecorder('/cabo/estacao/exit_tangent', Vector3dStreamParser, stop_event),
         'world': TopicRecorder('/stats', WorldStatsStreamParser, stop_event),
     }
     for recorder in recorders.values():
@@ -228,7 +241,8 @@ def main():
         world_rows[-1]['sim_time'] - world_rows[0]['sim_time'] if len(world_rows) > 1 else None
     )
 
-    for key in ('error', 'force', 'stats', 'anchor'):
+    for key in ('error', 'force', 'stats', 'anchor', 'reel',
+                'tensao', 'exit_force', 'exit_tangent'):
         recorder = recorders[key]
         path = out_dir / f'{args.prefix}_{key}.csv'
         with path.open('w', newline='') as handle:

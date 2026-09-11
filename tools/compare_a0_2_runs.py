@@ -61,9 +61,17 @@ def mission_metrics(run_dir):
     tracking = [r for r in rows if r['phase'] in TRACKING_PHASES]
     hover = [r for r in rows if r['phase'] == 'climb_hover']
     offboard_rows = [r for r in rows if r['phase'] in ('climb_hover',) + TRACKING_PHASES]
-    offboard_ok = bool(offboard_rows) and all(
-        px4_main_mode(num(r, 'custom_mode')) == 6 for r in offboard_rows
+    modes = [px4_main_mode(num(r, 'custom_mode')) for r in offboard_rows]
+    # O heartbeat chega a ~1 Hz enquanto os setpoints saem a 20 Hz, entao as
+    # primeiras amostras de voo ainda podem carregar o modo anterior. O criterio e
+    # OFFBOARD contínuo a partir da aquisicao do modo, nao desde a primeira amostra.
+    first_offboard = next((i for i, mode in enumerate(modes) if mode == 6), None)
+    offboard_ok = first_offboard is not None and all(
+        mode == 6 for mode in modes[first_offboard:]
     )
+    offboard_fraction = (
+        sum(1 for mode in modes if mode == 6) / len(modes) if modes else None)
+    offboard_acquisition_samples = first_offboard
     statuses = {int(v) for v in (num(r, 'system_status') for r in rows) if v is not None}
 
     # A fase climb_hover inclui a subida do solo ate 2 m: o RMS de ez sobre ela e
@@ -76,6 +84,8 @@ def mission_metrics(run_dir):
     return {
         'samples': len(rows),
         'offboard_held_during_flight': offboard_ok,
+        'offboard_fraction_of_flight': offboard_fraction,
+        'offboard_acquisition_samples': offboard_acquisition_samples,
         'system_status_values': sorted(statuses),
         'failsafe_state_seen': any(s >= 5 for s in statuses),
         'mission_failed_flag': summary.get('failed'),

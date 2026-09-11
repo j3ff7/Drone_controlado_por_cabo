@@ -16,12 +16,18 @@ FIELD_RE = re.compile(
 )
 
 
-def _finish_message(current, values):
-    if not current:
+def _finish_message(current, values, delimited=True, saw_content=True):
+    """Fecha uma mensagem. Campos ausentes valem 0 (protobuf omite zeros).
+
+    Uma mensagem so e invalida se ficou aberta no fim do stream (truncada) ou se
+    algum campo nao e finito. Exigir a presenca de x/y era errado: theta=0 e
+    omega=0 sao valores legitimos, e a serializacao de texto os omite.
+    """
+    if not saw_content:
         return 0
-    if 'x' not in current or 'y' not in current:
+    if not delimited:
         return 1
-    sample = (current['x'], current['y'], current.get('z', 0.0))
+    sample = (current.get('x', 0.0), current.get('y', 0.0), current.get('z', 0.0))
     if not all(math.isfinite(value) for value in sample):
         return 1
     values.append(sample)
@@ -32,24 +38,27 @@ def parse_vector3d_stream_detailed(text):
     values = []
     invalid_messages = 0
     current = {}
+    saw_content = False
 
     for line in text.splitlines():
         if not line.strip():
-            invalid_messages += _finish_message(current, values)
-            current = {}
+            invalid_messages += _finish_message(current, values, saw_content=saw_content)
+            current, saw_content = {}, False
             continue
 
+        saw_content = True
         match = FIELD_RE.match(line)
         if not match:
             continue
 
         field = match.group(1).lower()
         if field in current:
-            invalid_messages += _finish_message(current, values)
+            invalid_messages += _finish_message(current, values, saw_content=True)
             current = {}
         current[field] = float(match.group(2))
 
-    invalid_messages += _finish_message(current, values)
+    invalid_messages += _finish_message(
+        current, values, delimited=False, saw_content=saw_content)
     return values, invalid_messages
 
 

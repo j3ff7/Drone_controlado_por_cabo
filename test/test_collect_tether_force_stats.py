@@ -19,6 +19,7 @@ z: 1
 x: 0.3
 y: 3
 z: 1
+
 """
 
     values, invalid = collector.parse_vector3d_stream_detailed(text)
@@ -40,6 +41,7 @@ z: 1
 x: 0.3
 y: 1
 z: 0
+
 """
 
     values, invalid = collector.parse_vector3d_stream_detailed(text)
@@ -74,3 +76,41 @@ z: 0
 
     assert values == []
     assert invalid == 1
+
+
+def test_parse_accepts_message_whose_zero_fields_were_omitted():
+    collector = load_collector()
+    # theta=0 e omega=0 no reel parado: o protobuf de texto omite os dois campos.
+    text = "z: 1\n\nz: 1\n\n"
+
+    values, invalid = collector.parse_vector3d_stream_detailed(text)
+
+    assert invalid == 0
+    assert values == [(0.0, 0.0, 1.0), (0.0, 0.0, 1.0)]
+
+
+def test_parse_marks_message_without_closing_delimiter_invalid():
+    collector = load_collector()
+
+    values, invalid = collector.parse_vector3d_stream_detailed("x: 1\ny: 2\nz: 0\n")
+
+    assert values == []
+    assert invalid == 1
+
+
+def test_parse_reads_an_all_zero_message_that_prints_no_fields():
+    collector = load_collector()
+    # Vector3d com x=y=z=0 nao imprime campo algum; so o header aparece.
+    text = "header {\n  stamp {\n    sec: 1\n  }\n}\n\nheader {\n  stamp {\n    sec: 2\n  }\n}\n\n"
+
+    values, invalid = collector.parse_vector3d_stream_detailed(text)
+
+    assert invalid == 0
+    assert values == [(0.0, 0.0, 0.0), (0.0, 0.0, 0.0)]
+
+
+def test_parse_returns_nothing_for_an_empty_stream():
+    collector = load_collector()
+
+    assert collector.parse_vector3d_stream_detailed('') == ([], 0)
+    assert collector.parse_vector3d_stream_detailed('\n\n\n') == ([], 0)

@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<!--
+  Bancada de payout/retraction (A7): estacao + reel + guia + tether, SEM PX4 e sem UAV.
+
+  O plugin da constraint nao resolve o lado do UAV neste mundo e por isso nao aplica
+  forca alguma; o cabo fica pendurado na guia. E o cenario certo para P0-P4, que medem
+  o acoplamento reel -> comprimento sem a dinamica de voo no meio.
+
+  Uso:
+    export GZ_SIM_RESOURCE_PATH=/home/lima/codes/ic/drone-cabo/src/pacote_do_drone/models
+    export GZ_SIM_SYSTEM_PLUGIN_PATH=/home/lima/codes/ic/drone-cabo/build/gz_plugins
+    gz sim -s -r src/pacote_do_drone/worlds/payout_bench.sdf
+-->
+<sdf version="1.9">
+  <world name="payout_bench">
+    <physics name="default" type="ode">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <gravity>0 0 -9.8</gravity>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <direction>-0.5 0.3 -0.9</direction>
+    </light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+          <material><diffuse>0.86 0.87 0.89 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <include>
+      <uri>model://tether_anchor_chain</uri>
+      <name>tether_anchor_chain</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

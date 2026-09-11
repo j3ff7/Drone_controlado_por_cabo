@@ -90,3 +90,28 @@ def test_world_stats_parser_rejects_truncated_message_instead_of_reporting_zero(
     assert samples == [(10.0, 0.0, float('nan'))] or math.isnan(samples[0][2])
     assert len(samples) == 1
     assert parser.invalid_messages == 1
+
+
+def test_reel_at_rest_is_a_valid_sample_not_an_invalid_message():
+    parser = recorder.Vector3dStreamParser()
+    # Reel parado: theta=0 e omega=0 sao omitidos pelo protobuf de texto, sobra o flag.
+    samples = drain(parser, 'z: 1\n\nz: 1\n\n')
+
+    assert samples == [(0.0, 0.0, 1.0), (0.0, 0.0, 1.0)]
+    assert parser.invalid_messages == 0
+
+
+def test_all_zero_message_is_recorded_not_dropped():
+    parser = recorder.Vector3dStreamParser()
+    # Sem nenhum campo impresso, o header ainda marca que houve mensagem.
+    samples = drain(parser, 'header {\n  stamp {\n    sec: 1\n  }\n}\n\n')
+
+    assert samples == [(0.0, 0.0, 0.0)]
+    assert parser.invalid_messages == 0
+
+
+def test_empty_stream_yields_no_samples():
+    parser = recorder.Vector3dStreamParser()
+
+    assert drain(parser, '') == []
+    assert parser.invalid_messages == 0
