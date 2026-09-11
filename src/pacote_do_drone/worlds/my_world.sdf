@@ -71,7 +71,7 @@
     <include>
       <uri>model://meu_drone</uri>
       <name>meu_drone</name>
-      <pose>2.396885 0.180000 0.219759 0 0 0.000000</pose>
+      <pose>2.097274 0.180000 0.235039 0 0 0.000000</pose>
     </include>
 
     <joint name="cabo_drone_joint" type="ball">

@@ -7,7 +7,7 @@ from pathlib import Path
 # ============================================================
 
 raiz_pacote = Path(__file__).resolve().parent.parent
-caminho_json = raiz_pacote / 'parameters' / 'tether_parameters.json'
+caminho_json = raiz_pacote /'tether_package' / 'parameters' / 'tether_parameters.json'
 pasta_models = raiz_pacote / 'models'
 pasta_worlds = raiz_pacote / 'worlds'
 caminho_sdf = pasta_models / 'cabo.sdf'

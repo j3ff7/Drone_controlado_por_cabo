@@ -42,7 +42,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'sensores = pacote_do_drone.sensores:main'
+            'sensores = pacote_do_drone.sensores:main',
+            'mission_test1 = pacote_do_drone.mission_test1:main',
         ],
     },
 )
