@@ -287,4 +287,157 @@ O nó de controle pode então ser iniciado, por exemplo:
 ros2 run pacote_do_drone <nome_do_no>
 ```
 
-O nome do e
+O nome do executável deve ser substituído pelo controlador utilizado no experimento.
+
+O ROS 2 é utilizado para desenvolver controladores e algoritmos que se comunicam com o PX4 durante a simulação.
+
+---
+
+# 🎮 Controle do Drone
+
+O controle de voo é realizado pelo **PX4 Autopilot**.
+
+Os comandos podem ser enviados por diferentes interfaces, incluindo:
+
+* QGroundControl;
+* ROS 2;
+* comandos internos do PX4;
+* outros sistemas compatíveis com a interface de comunicação utilizada.
+
+Nos experimentos desenvolvidos neste projeto, o ROS 2 pode ser utilizado para implementar missões e controladores externos.
+
+Exemplos de aplicações:
+
+* voo por waypoints;
+* controle de posição;
+* controle de velocidade;
+* controle em modo Offboard;
+* coleta de dados;
+* avaliação da influência do cabo sobre o movimento do drone.
+
+---
+
+# 📡 Integração PX4 + ROS 2
+
+O PX4 possui suporte à integração com ROS 2 por meio de sua arquitetura de comunicação baseada em DDS.
+
+A integração permite que nós ROS 2:
+
+* enviem comandos ao PX4;
+* recebam estados do veículo;
+* acompanhem posição e velocidade;
+* implementem controladores externos;
+* coletem dados da simulação.
+
+Exemplos de mensagens utilizadas no desenvolvimento incluem:
+
+```text
+OffboardControlMode
+TrajectorySetpoint
+VehicleCommand
+VehicleStatus
+VehicleLocalPosition
+```
+
+---
+
+# 📊 Aquisição de Dados
+
+Durante os experimentos podem ser registrados dados relacionados ao comportamento do veículo e do cabo.
+
+Entre as variáveis de interesse estão:
+
+* posição do drone;
+* velocidade;
+* orientação;
+* trajetória desejada;
+* trajetória realizada;
+* comandos enviados ao PX4;
+* ângulos do cabo;
+* tensão no cabo;
+* comprimento do cabo.
+
+Os resultados dos experimentos podem ser armazenados em:
+
+```text
+results/controller_tests/
+```
+
+Esses dados podem posteriormente ser utilizados para gerar gráficos e avaliar o desempenho dos controladores.
+
+---
+
+# 🧪 Estado Atual do Projeto
+
+Atualmente, o projeto possui uma arquitetura de simulação baseada em:
+
+```text
+PX4 SITL
+   +
+Gazebo
+   +
+X500
+   +
+Cabo flexível
+   +
+Ball Joint
+   +
+ROS 2
+```
+
+O modelo do cabo já está integrado ao X500 utilizado pelo PX4.
+
+Os principais esforços de desenvolvimento estão relacionados à:
+
+* modelagem física do cabo;
+* integração drone–cabo;
+* estabilidade da simulação;
+* controle do UAV considerando o cabo;
+* aquisição de dados;
+* desenvolvimento de controladores;
+* avaliação do comportamento dinâmico do sistema.
+
+---
+
+# 🔬 Objetivo de Pesquisa
+
+O projeto está inserido no contexto de **UAVs cabeados (*tethered UAVs*)**, nos quais um cabo físico conecta o veículo aéreo a uma estrutura externa.
+
+A presença do cabo pode fornecer vantagens como:
+
+* operação prolongada;
+* fornecimento contínuo de energia;
+* comunicação por cabo;
+* redução da dependência de baterias.
+
+Entretanto, o cabo também introduz restrições dinâmicas e geométricas que afetam:
+
+* mobilidade;
+* estabilidade;
+* planejamento de movimento;
+* controle;
+* segurança operacional.
+
+Assim, a simulação desenvolvida neste projeto busca fornecer uma plataforma para estudar essas interações antes da implementação em sistemas físicos.
+
+---
+
+# 📚 Referências
+
+### PX4 Autopilot
+
+[PX4 Autopilot — GitHub](https://github.com/PX4/PX4-Autopilot?utm_source=chatgpt.com)
+
+### Documentação PX4
+
+[PX4 User Guide](https://docs.px4.io/?utm_source=chatgpt.com)
+
+### ROS 2
+
+[ROS 2 Documentation](https://docs.ros.org/?utm_source=chatgpt.com)
+
+---
+
+# 📄 Licença
+
+Este projeto está licenciado sob os termos da **MIT License**.
