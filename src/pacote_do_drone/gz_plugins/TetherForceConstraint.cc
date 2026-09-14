@@ -61,6 +61,9 @@ class TetherForceConstraint:
     this->tensionPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/estacao/tensao");
     this->exitForcePub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/estacao/exit_force");
     this->exitTangentPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/estacao/exit_tangent");
+    this->tangentBodyPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/tangent_body");
+    this->anglesPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/angles");
+    this->forceBodyPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/force_body");
   }
 
   public: void PreUpdate(
@@ -118,6 +121,7 @@ class TetherForceConstraint:
     statsMsg.set_z(saturated ? 1.0 : 0.0);
     this->statsPub.Publish(statsMsg);
 
+    this->PublishConnectionGeometry(*dronePose, *tetherPose, forceOnTether);
     this->PublishAnchorUnavailable();
     this->PublishExitPose(_ecm);
     this->PublishReelState(_ecm);
@@ -267,6 +271,62 @@ class TetherForceConstraint:
   //
   // Somatorio de Newton sobre os N elos, cujas unicas forcas externas sao a reacao da
   // guia, a forca da constraint na ponta do UAV e o peso:
+  // Direcao local do cabo junto ao UAV, sem junta fisica. O ultimo elo se estende no
+  // +x local ate a ponta ligada ao drone, entao a direcao que SAI do drone ao longo do
+  // cabo e -R_N * (1,0,0). Expressa no frame do link do drone (tether_attach_link, mesma
+  // orientacao do base_link do X500: x frente, y esquerda, z cima):
+  //
+  //     t_body   = R_drone^-1 * t_world
+  //     azimute  = atan2(t_y, t_x)                  0 = frente, +90 = esquerda
+  //     elevacao = atan2(t_z, sqrt(t_x^2 + t_y^2))  -90 = cabo pendurado reto abaixo
+  //
+  // A forca da constraint sobre o drone (-F) aponta do drone para a ponta do cabo. Com a
+  // complacencia e = F/K ela nao precisa coincidir com a tangente; o angulo entre as duas
+  // e publicado para medir quanto a forca, sozinha, representa a direcao do cabo.
+  // So leitura: nada aqui altera a dinamica.
+  private: void PublishConnectionGeometry(
+      const gz::math::Pose3d &_drone,
+      const gz::math::Pose3d &_tether,
+      const gz::math::Vector3d &_forceOnTether)
+  {
+    const gz::math::Quaterniond toBody = _drone.Rot().Inverse();
+    gz::math::Vector3d tangentWorld =
+        -_tether.Rot().RotateVector(gz::math::Vector3d(1, 0, 0));
+    tangentWorld.Normalize();
+    const gz::math::Vector3d tangentBody = toBody.RotateVector(tangentWorld);
+    const gz::math::Vector3d forceOnDroneBody = toBody.RotateVector(-_forceOnTether);
+
+    const double deg = 180.0 / M_PI;
+    const double azimuth = std::atan2(tangentBody.Y(), tangentBody.X()) * deg;
+    const double elevation =
+        std::atan2(tangentBody.Z(), std::hypot(tangentBody.X(), tangentBody.Y())) * deg;
+    double misalignment = std::numeric_limits<double>::quiet_NaN();
+    const double forceNorm = forceOnDroneBody.Length();
+    if (forceNorm > 1e-9)
+    {
+      const double c = tangentBody.Dot(forceOnDroneBody / forceNorm);
+      misalignment = std::acos(std::clamp(c, -1.0, 1.0)) * deg;
+    }
+
+    gz::msgs::Vector3d tangentMsg;
+    tangentMsg.set_x(tangentBody.X());
+    tangentMsg.set_y(tangentBody.Y());
+    tangentMsg.set_z(tangentBody.Z());
+    this->tangentBodyPub.Publish(tangentMsg);
+
+    gz::msgs::Vector3d anglesMsg;
+    anglesMsg.set_x(azimuth);
+    anglesMsg.set_y(elevation);
+    anglesMsg.set_z(misalignment);
+    this->anglesPub.Publish(anglesMsg);
+
+    gz::msgs::Vector3d forceMsg;
+    forceMsg.set_x(forceOnDroneBody.X());
+    forceMsg.set_y(forceOnDroneBody.Y());
+    forceMsg.set_z(forceOnDroneBody.Z());
+    this->forceBodyPub.Publish(forceMsg);
+  }
+
   //
   //     sum(m_i a_i) = F_exit + F_c + sum(m_i g)
   //     F_exit       = sum(m_i a_i) - F_c - sum(m_i g)
@@ -470,6 +530,9 @@ class TetherForceConstraint:
   private: gz::transport::Node::Publisher tensionPub;
   private: gz::transport::Node::Publisher exitForcePub;
   private: gz::transport::Node::Publisher exitTangentPub;
+  private: gz::transport::Node::Publisher tangentBodyPub;
+  private: gz::transport::Node::Publisher anglesPub;
+  private: gz::transport::Node::Publisher forceBodyPub;
 };
 }
 

@@ -205,6 +205,11 @@ def main():
         'tensao': TopicRecorder('/cabo/estacao/tensao', Vector3dStreamParser, stop_event),
         'exit_force': TopicRecorder('/cabo/estacao/exit_force', Vector3dStreamParser, stop_event),
         'exit_tangent': TopicRecorder('/cabo/estacao/exit_tangent', Vector3dStreamParser, stop_event),
+        # Junto ao UAV, no frame do drone: tangente do ultimo elo, (azimute, elevacao,
+        # desalinhamento forca-tangente) em graus, e a forca da constraint sobre o drone.
+        'tangent_body': TopicRecorder('/cabo/conexao/tangent_body', Vector3dStreamParser, stop_event),
+        'angles': TopicRecorder('/cabo/conexao/angles', Vector3dStreamParser, stop_event),
+        'force_body': TopicRecorder('/cabo/conexao/force_body', Vector3dStreamParser, stop_event),
         'world': TopicRecorder('/stats', WorldStatsStreamParser, stop_event),
     }
     for recorder in recorders.values():
@@ -241,8 +246,9 @@ def main():
         world_rows[-1]['sim_time'] - world_rows[0]['sim_time'] if len(world_rows) > 1 else None
     )
 
-    for key in ('error', 'force', 'stats', 'anchor', 'reel',
-                'tensao', 'exit_force', 'exit_tangent'):
+    # Todos os topicos gravados, nao uma lista fixa: uma lista fixa descartava em
+    # silencio os topicos adicionados depois (tangent_body, angles, force_body).
+    for key in [k for k in recorders if k != 'world']:
         recorder = recorders[key]
         path = out_dir / f'{args.prefix}_{key}.csv'
         with path.open('w', newline='') as handle:

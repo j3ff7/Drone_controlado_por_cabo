@@ -4,6 +4,14 @@ Analise feita em 2026-09-14 lendo o codigo, sem assumir a arquitetura. A `dev` f
 inspecionada num snapshot de `origin/dev` (`76be39a`, extraido com `git archive`, sem
 checkout); a `shared` no working tree (`6909ff0` + ajustes desta rodada).
 
+> **Diagnostico confirmado (2026-09-14):** a branch `dev` **nao contem** a integracao
+> PX4 + X500 + tether. Ela so tem a simulacao drone proprio (`meu_drone`) + cabo + carretel,
+> sem PX4, iniciada por `ros2 launch pacote_do_drone start_sim.launch.py` (Ignition Gazebo 6).
+> Nenhum commit do historico da `dev` toca `PX4_GZ_MODEL`, `gz_x500`, `px4_sitl` ou `x500`, e
+> `main`/`tests` tambem nao. A integracao PX4 + X500 + tether foi desenvolvida **exclusivamente
+> na `shared`**, a partir de `309e6eb` (2026-09-03), depois da divergencia das branches
+> (`80d3994`, 2026-06-05). Nenhum codigo da simulacao da `dev` foi copiado para a `shared`.
+
 ## 1. Branch `dev`
 
 ### 1.1 Achado principal: nao ha X500 na `dev`

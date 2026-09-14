@@ -2010,6 +2010,7 @@ O reel/TMS sai da dinamica principal ate B1–B4 terminarem. O modelo de produca
 | **C1–C4** | Topologia alternativa do cabo: revolutes alternadas no lugar de `BallJoint` | B2 | **FAIL** — regressao; descartada e codigo removido (ver C1–C4) |
 | **U1** | `UniversalJoint` no lugar de `BallJoint`, N=10 | C1–C4 | **FAIL** — igual a ball em repouso, anisotropia de 16% sob carga lateral |
 | **X1** | Conexao fisica tether ↔ X500 (arquitetura da `dev`) | U1 | **FAIL** — estatico PASS; vertical aborta quando o cabo descola do solo (a constraint de forca tambem) |
+| **X2** | Conexao por forca x `BallJoint` para medir angulos do cabo | X1 | **manter plugin de forca** + medicao geometrica de tangente/azimute/elevacao (validada contra poses) |
 | **B3** | Validacao dinamica de poucas configuracoes representativas | B2 | pendente |
 | **B4** | Derivar requisitos reais do reel/TMS a partir dos dados do tether | B3 | pendente |
 
@@ -2601,13 +2602,17 @@ Cada caso se repete com ate 0,4% em `\|F_uav\|`. Entre si, porem, as duas orient
 
 Analise completa em [`docs/TETHER_X500_CONNECTION_ANALYSIS.md`](TETHER_X500_CONNECTION_ANALYSIS.md). Resumo:
 
-- **A `dev` nao tem X500.** Seu drone (`meu_drone`) e controlado pelo proprio Gazebo, sem PX4 no lazo; a conexao do cabo e estatica, por juntas `ball` declaradas no SDF do **mundo**: tambor → raiz do cabo e ponta do cabo → `meu_drone::base_link`. O `tether_package` so fornece parametros e um gerador avulso nao usado.
+- **A `dev` nao tem X500** — nem no historico: a integracao PX4 + X500 + tether existe so na `shared`, desde `309e6eb` (2026-09-03), apos a divergencia das branches. Seu drone (`meu_drone`) e controlado pelo proprio Gazebo, sem PX4 no lazo; a conexao do cabo e estatica, por juntas `ball` declaradas no SDF do **mundo**: tambor → raiz do cabo e ponta do cabo → `meu_drone::base_link`. O `tether_package` so fornece parametros e um gerador avulso nao usado.
 - **A `shared` conectava o drone por forca** (`TetherForceConstraint`), sem junta. Esta rodada reproduziu a arquitetura da `dev` com o X500: `tools/generate_x500_tether_world.py` gera `worlds/x500_tether_joint.sdf` com junta `ball` de mundo da ponta do cabo ao `base_link` do X500 (pivo no `tether_attach_link`), cabo `ball` sem plugin e reel estatico; o PX4 se liga ao X500 existente por `PX4_GZ_MODEL_NAME`.
 - **Estatico: PASS** em duas geometrias (0,5 e 1,2 m). **Vertical: FAIL** nas duas, com a junta integra ate o aborto do DART. **Horizontal: nao executado.**
 - **Controle:** a mesma geometria com a constraint de forca original **tambem aborta**, no mesmo evento — o ultimo trecho do cabo com colisoes saindo do solo durante a subida. Com junta rigida a carga vira o drone antes; com forca limitada o drone fica nivelado, mas o simulador cai igual.
 - **Correcao ao que foi afirmado antes:** as falhas em voo de B1, da visualizacao com N=10 e desta rodada tem em comum o cabo com colisoes apoiado no solo no inicio do voo; os voos que passaram nas rodadas A eram sem colisoes nos elos.
 
 Proximo passo recomendado: voar com o cabo pendurado sem contato com o solo (X500 decolando acima da guia) antes de qualquer nova troca de conexao ou de junta.
+
+#### X2 — Angulos do tether junto ao UAV: plugin de forca x `BallJoint`
+
+Analise em [`docs/TETHER_CONNECTION_FORCE_VS_BALLJOINT.md`](TETHER_CONNECTION_FORCE_VS_BALLJOINT.md). O plugin `TetherForceConstraint` passou a publicar a tangente do ultimo elo, azimute, elevacao e a forca no frame do drone (`/cabo/conexao/tangent_body`, `/cabo/conexao/angles`, `/cabo/conexao/force_body`). Estatico e voo vertical com a baseline das rodadas A: a medicao concorda com o calculo independente pelas poses em 0,02–0,06 grau (mediana), o voo cobre 69,7 de 70 s sem aborto nem failsafe, e a forca da conexao fica a 0,5–0,7 grau (mediana) da tangente. **Decisao: manter a conexao por forca.** A `BallJoint` nao acrescenta informacao de angulo, tiraria a medida direta de forca e ja mostrou risco numerico na X1. Limitacao: com o cabo quase vertical o azimute e mal condicionado, com qualquer metodo.
 
 #### B2 — escalabilidade com comprimento
 

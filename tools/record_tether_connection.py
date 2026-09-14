@@ -38,6 +38,33 @@ def compose(parent, child_pos):
     return (p[0] + r[0], p[1] + r[1], p[2] + r[2])
 
 
+def quat_mul(a, b):
+    ax, ay, az, aw = a
+    bx, by, bz, bw = b
+    return (aw * bx + ax * bw + ay * bz - az * by,
+            aw * by - ax * bz + ay * bw + az * bx,
+            aw * bz + ax * by - ay * bx + az * bw,
+            aw * bw - ax * bx - ay * by - az * bz)
+
+
+def quat_conj(q):
+    return (-q[0], -q[1], -q[2], q[3])
+
+
+def tether_angles(drone_q, last_link_q):
+    """Tangente do cabo junto ao drone e (azimute, elevacao) no frame do drone, em graus.
+
+    Mesma convencao do plugin: o ultimo elo se estende no +x local ate o drone, entao a
+    direcao que sai do drone ao longo do cabo e -R_N (1,0,0); azimute 0 = frente,
+    +90 = esquerda; elevacao -90 = cabo pendurado reto abaixo.
+    """
+    t_world = quat_rotate(last_link_q, (-1.0, 0.0, 0.0))
+    t_body = quat_rotate(quat_conj(drone_q), t_world)
+    azimuth = math.degrees(math.atan2(t_body[1], t_body[0]))
+    elevation = math.degrees(math.atan2(t_body[2], math.hypot(t_body[0], t_body[1])))
+    return t_body, azimuth, elevation
+
+
 def roll_pitch_deg(q):
     x, y, z, w = q
     roll = math.atan2(2 * (w * x + y * z), 1 - 2 * (x * x + y * y))
@@ -128,13 +155,17 @@ def main():
         first = compose(tether, poses['tether_link_1'][0])
         zs = [compose(tether, poses[n][0])[2] for n in tether_links if n in poses]
         roll, pitch = roll_pitch_deg(drone[1])
+        last_world_q = quat_mul(tether[1], last_ori)
+        t_body, azimuth, elevation = tether_angles(drone[1], last_world_q)
         row = {'t_sim': t,
                'tip_x': tip[0], 'tip_y': tip[1], 'tip_z': tip[2],
                'attach_x': attach[0], 'attach_y': attach[1], 'attach_z': attach[2],
                'pivot_gap': math.dist(tip, attach), 'exit_gap': math.dist(first, exit_point),
                'z_min_tether': min(zs) if zs else math.nan,
                'drone_x': drone[0][0], 'drone_y': drone[0][1], 'drone_z': drone[0][2],
-               'roll_deg': roll, 'pitch_deg': pitch}
+               'roll_deg': roll, 'pitch_deg': pitch,
+               'tan_body_x': t_body[0], 'tan_body_y': t_body[1], 'tan_body_z': t_body[2],
+               'azimuth_deg': azimuth, 'elevation_deg': elevation}
         with lock:
             rows.append(row)
 
@@ -185,6 +216,9 @@ def main():
             'drone_z_max_m': max(finite('drone_z')),
             'attach_z_initial_m': data[0]['attach_z'],
             'nan_values': nan,
+            'azimuth_deg': {'first': data[0]['azimuth_deg'], 'last': data[-1]['azimuth_deg']},
+            'elevation_deg': {'first': data[0]['elevation_deg'], 'last': data[-1]['elevation_deg'],
+                              'min': min(finite('elevation_deg')), 'max': max(finite('elevation_deg'))},
         })
     if rtf:
         summary['rtf'] = {'mean': sum(rtf) / len(rtf), 'min': min(rtf), 'samples': len(rtf)}

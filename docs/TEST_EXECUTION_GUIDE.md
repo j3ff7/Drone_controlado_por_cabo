@@ -1366,3 +1366,28 @@ plugin de forca, e ler o wrench da junta via `TransmittedWrench` ja derrubou o D
   executavel (`ps -eo pid,comm`).
 - A campanha recusa iniciar o PX4 se o mundo ja morreu: sem isso o PX4 sobe o proprio `default`,
   sem o X500, e a missao so expira.
+
+## Angulos do tether junto ao UAV (conexao por plugin de forca)
+
+O `TetherForceConstraint` publica, so leitura, a direcao local do cabo junto ao drone:
+
+| Topico | Conteudo |
+| --- | --- |
+| `/cabo/conexao/tangent_body` | tangente que sai do drone ao longo do ultimo elo, frame do drone (x frente, y esquerda, z cima) |
+| `/cabo/conexao/angles` | `x` = azimute, `y` = elevacao (-90 = cabo reto abaixo), `z` = angulo entre a forca e a tangente, em graus |
+| `/cabo/conexao/force_body` | forca da conexao sobre o drone, frame do drone |
+
+```bash
+./tools/build_tether_force_plugin.sh
+tools/run_tether_angle_check.sh plugin_only        # estatico 30 s + voo vertical curto
+gz topic -e -t /cabo/conexao/angles                 # com a simulacao rodando
+```
+
+O `tools/record_tether_timeseries.py` grava os tres topicos (`<prefixo>_angles.csv` etc.), e
+`tools/record_tether_connection.py` calcula os mesmos angulos a partir das poses do Gazebo, como
+checagem independente. Com o cabo quase vertical o azimute e mal condicionado e nao deve ser
+interpretado. Analise: `docs/TETHER_CONNECTION_FORCE_VS_BALLJOINT.md`.
+
+Duas armadilhas corrigidas nesta rodada: o gravador escrevia so uma lista fixa de topicos (os
+novos eram recebidos e descartados), e um `wait` sem PID no script esperava tambem o PX4, que
+nao termina.

@@ -54,3 +54,39 @@ def test_roll_and_pitch_from_quaternion():
     pitch_q = (0.0, math.sin(math.radians(10)), 0.0, math.cos(math.radians(10)))  # 20 graus
     assert close(rec.roll_pitch_deg(roll_q), (30.0, 0.0), tol=1e-6)
     assert close(rec.roll_pitch_deg(pitch_q), (0.0, 20.0), tol=1e-6)
+
+
+def _axis_angle(axis, degrees):
+    half = math.radians(degrees) / 2.0
+    return (axis[0] * math.sin(half), axis[1] * math.sin(half), axis[2] * math.sin(half),
+            math.cos(half))
+
+
+def test_cable_leaving_the_drone_backwards_is_azimuth_180():
+    # ultimo elo alinhado com +x do mundo: o cabo sai do drone para tras (-x)
+    t, az, el = rec.tether_angles(IDENTITY, IDENTITY)
+    assert close(t, (-1.0, 0.0, 0.0))
+    assert math.isclose(abs(az), 180.0, abs_tol=1e-9)
+    assert math.isclose(el, 0.0, abs_tol=1e-9)
+
+
+def test_cable_hanging_straight_down_is_elevation_minus_90():
+    # elo girado -90 graus em y: seu +x aponta para cima, o cabo sai do drone para baixo
+    link = _axis_angle((0.0, 1.0, 0.0), -90.0)
+    t, _, el = rec.tether_angles(IDENTITY, link)
+    assert close(t, (0.0, 0.0, -1.0))
+    assert math.isclose(el, -90.0, abs_tol=1e-6)
+
+
+def test_angles_are_in_the_drone_frame_not_the_world_frame():
+    # drone girado +90 graus em yaw: frente = +y do mundo; o cabo em -x do mundo fica a esquerda
+    drone = _axis_angle((0.0, 0.0, 1.0), 90.0)
+    t, az, el = rec.tether_angles(drone, IDENTITY)
+    assert close(t, (0.0, 1.0, 0.0))
+    assert math.isclose(az, 90.0, abs_tol=1e-6)
+    assert math.isclose(el, 0.0, abs_tol=1e-6)
+
+
+def test_quaternion_product_composes_rotations():
+    q = rec.quat_mul(_axis_angle((0.0, 0.0, 1.0), 90.0), _axis_angle((0.0, 0.0, 1.0), 90.0))
+    assert close(rec.quat_rotate(q, (1.0, 0.0, 0.0)), (-1.0, 0.0, 0.0))
