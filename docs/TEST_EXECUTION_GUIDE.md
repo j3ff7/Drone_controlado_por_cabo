@@ -1286,3 +1286,83 @@ Os picos do transitorio variam entre repeticoes e nao servem para comparar casos
 drone sobe ~0,84 m, mas a missao vertical sobe 2 m (exigiria 3,08 m de cabo). As quedas em
 voo acontecem nessa subida. Ate a geometria do teste de voo ser corrigida, uma "falha em
 voo" nao diz nada sobre o tipo de junta ou o numero de elos.
+
+## Tether ligado ao X500 por juntas fisicas (arquitetura da `dev`)
+
+Analise e decisao em `docs/TETHER_X500_CONNECTION_ANALYSIS.md`. Aqui nao ha
+`TetherForceConstraint`: a ponta do cabo e ligada ao `base_link` do X500 por uma junta
+`ball` de mundo, com pivo no `tether_attach_link`, e a raiz do cabo fica na guia fixa da
+estacao. Juntas internas `ball`, colisoes, reel estatico sem atuador, sem prismatica.
+
+### Gerar o mundo
+
+```bash
+cd /home/lima/codes/ic/drone-cabo
+# X500 a 0,5 m da estacao: com 2,5 m de cabo, 2 m de subida e 0,5 m de deslocamento cabem
+./tools/generate_x500_tether_world.py --drone-x 0.5
+export GZ_SIM_RESOURCE_PATH=$PWD/src/pacote_do_drone/models:$PWD/px4/PX4-Autopilot/Tools/simulation/gz/models
+gz sdf -k src/pacote_do_drone/worlds/x500_tether_joint.sdf
+```
+
+O gerador recusa uma posicao em que o cabo nao alcance o drone, mas **nao** confere se a
+missao cabe no alcance do cabo. Confira antes de voar: com o pivo do drone em
+`(D, 0, 0,107)` e a guia em `(0, 0, 0,19)`, a distancia no hover e
+`sqrt(D^2 + dy^2 + (h + 0,107 - 0,19)^2)`, onde `h` e a subida real — some ~0,2 m ao alvo da
+missao, porque a estimativa do PX4 costuma nascer deslocada. Mantenha abaixo de ~90% de `L`.
+
+### Estatico (sem PX4)
+
+```bash
+gz sim -s -r src/pacote_do_drone/worlds/x500_tether_joint.sdf &       # tire o -s para ver
+./tools/record_tether_connection.py --duration 45 --output-dir results/x500_joint/estatico \
+  --links 10 --segment-length 0.25 --settle 15
+```
+
+### Voo: o PX4 se liga ao X500 que ja esta no mundo
+
+```bash
+# terminal 1: mundo (com interface grafica)
+gz sim -r src/pacote_do_drone/worlds/x500_tether_joint.sdf
+
+# terminal 2: PX4 sem spawnar outro drone
+cd px4/PX4-Autopilot
+PX4_GZ_MODEL_NAME=x500_tether_attach_0 HEADLESS=1 make px4_sitl gz_x500
+# esperar "Ready for takeoff!"
+
+# terminal 3: gravacao + missao
+cd /home/lima/codes/ic/drone-cabo
+./tools/record_tether_connection.py --duration 75 --output-dir results/x500_joint/vertical \
+  --links 10 --segment-length 0.25 --settle 5 &
+./tools/px4_offboard_horizontal_mission.py --output-dir results/x500_joint/vertical \
+  --dx 0.0 --altitude 2.0 --rate 20
+# horizontal: mesmo procedimento com --dx 0.5 (x local do PX4 = norte = +y do Gazebo)
+```
+
+**Nao confie so no `failed` da missao.** A ferramenta nao percebe se o simulador morreu.
+Confira `sim_time_covered_s` no `conexao_summary.json` (tem de cobrir a gravacao),
+`grep -c Assertion` no log do Gazebo e `grep -i failsafe` no log do PX4.
+
+`tools/run_x500_joint_campaign.sh [D]` encadeia estatico, vertical e horizontal com esses
+criterios e so executa o horizontal se o vertical passar. Resultados em
+`results/x500_joint/D<D>/`.
+
+Metricas: `pivot_gap_m` e o erro de conexao de uma junta (distancia ponta do cabo → pivo;
+integra ≈ 0). `|F_uav|` e `T_est` **nao existem** nesta arquitetura: eram calculados pelo
+plugin de forca, e ler o wrench da junta via `TransmittedWrench` ja derrubou o DART nesta stack.
+
+### Resultado e cuidados (rodada X1)
+
+- Estatico **PASS** com X500 a 0,5 e a 1,2 m; vertical **FAIL** nas duas geometrias, e o
+  controle com a constraint de forca na mesma geometria tambem aborta. O gatilho comum e o
+  cabo **com colisoes** sendo arrancado do solo durante a subida. Detalhes e linha do tempo em
+  `docs/TETHER_X500_CONNECTION_ANALYSIS.md`.
+- **Sem colisoes nos elos o mundo nem se sustenta estaticamente** com essa folga: o laco inicial
+  cai livre atraves do solo e o DART aborta (`GenericJoint::addChildBiasForceToDynamic`).
+- **Spawn pelo PX4 afunda o X500**: `PX4_GZ_MODEL_POSE` com z = 0 sobrescreve a pose do modelo e
+  o `base_link` repousa a z ≈ 0,02 m (contra 0,227 m quando o X500 e incluido no mundo). Nos voos
+  com a constraint de forca isso poe a ponta do cabo abaixo do solo desde o inicio.
+- **`pkill -f` com um padrao que aparece no proprio comando mata o shell que o executa.** Rode a
+  limpeza de dentro de um script (como `tools/run_x500_joint_campaign.sh`) ou mate por nome de
+  executavel (`ps -eo pid,comm`).
+- A campanha recusa iniciar o PX4 se o mundo ja morreu: sem isso o PX4 sobe o proprio `default`,
+  sem o X500, e a missao so expira.

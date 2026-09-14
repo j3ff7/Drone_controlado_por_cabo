@@ -155,7 +155,7 @@ def loop_vectors(n_links, link_length):
     return vectors
 
 
-def taut_vectors(n_links, link_length, target):
+def taut_vectors(n_links, link_length, target, bulge='down'):
     """Cabo ESTICADO entre a guia e o attach do UAV, distribuido em N elos iguais.
 
     Resolve o arco circular em que uma poligonal de N cordas de comprimento exato
@@ -199,7 +199,9 @@ def taut_vectors(n_links, link_length, target):
 
     # Base local: u ao longo da corda, d perpendicular apontando para baixo.
     unit = [component / chord for component in target]
-    down = [0.0, 0.0, -1.0]
+    # bulge='up' espelha o arco para cima: com folga grande o arco para baixo nasceria
+    # atravessando o solo, e elos que nascem abaixo do plano ficam presos la.
+    down = [0.0, 0.0, -1.0] if bulge == 'down' else [0.0, 0.0, 1.0]
     projection = sum(down[i] * unit[i] for i in range(3))
     sag = [down[i] - projection * unit[i] for i in range(3)]
     sag_norm = math.sqrt(sum(component * component for component in sag))
@@ -467,6 +469,7 @@ def generate(
     payout_mass_arg,
     joint_type='ball',
     universal_roll=0.0,
+    taut_bulge='down',
 ):
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     # --- Geometria do suporte do TMS ----------------------------------------
@@ -730,7 +733,7 @@ def generate(
 {payout_block}''']
     if initial_axis in ('coil', 'loop', 'taut'):
         if initial_axis == 'taut':
-            vectors = taut_vectors(n_links, link_length, taut_target)
+            vectors = taut_vectors(n_links, link_length, taut_target, taut_bulge)
         else:
             shape = coil_vectors if initial_axis == 'coil' else loop_vectors
             vectors = shape(n_links, link_length)
@@ -905,6 +908,8 @@ def main():
     parser.add_argument('--taut-target', default='2.38 0 -0.083',
                         help='attach do UAV relativo ao tether_exit_point [m], '
                              'usado por --initial-axis taut')
+    parser.add_argument('--taut-bulge', choices=('down', 'up'), default='down',
+                        help='sentido do arco de --initial-axis taut; up evita nascer no solo')
     parser.add_argument('--force-constraint', action='store_true')
     parser.add_argument('--drone-model', default='x500_tether_attach_0')
     parser.add_argument('--drone-link', default='tether_attach_link')
@@ -1014,6 +1019,7 @@ def main():
         args.payout_mass,
         joint_type=args.joint_type,
         universal_roll=args.universal_roll,
+        taut_bulge=args.taut_bulge,
     )
 
 

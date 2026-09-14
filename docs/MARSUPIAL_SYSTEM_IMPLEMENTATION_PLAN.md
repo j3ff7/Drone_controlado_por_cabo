@@ -2009,6 +2009,7 @@ O reel/TMS sai da dinamica principal ate B1–B4 terminarem. O modelo de produca
 | **B2** | Escalabilidade com `L` mantendo `l` de B1; achar o limite pratico de `L x N` | B1 | **FAIL** (ver B2) |
 | **C1–C4** | Topologia alternativa do cabo: revolutes alternadas no lugar de `BallJoint` | B2 | **FAIL** — regressao; descartada e codigo removido (ver C1–C4) |
 | **U1** | `UniversalJoint` no lugar de `BallJoint`, N=10 | C1–C4 | **FAIL** — igual a ball em repouso, anisotropia de 16% sob carga lateral |
+| **X1** | Conexao fisica tether ↔ X500 (arquitetura da `dev`) | U1 | **FAIL** — estatico PASS; vertical aborta quando o cabo descola do solo (a constraint de forca tambem) |
 | **B3** | Validacao dinamica de poucas configuracoes representativas | B2 | pendente |
 | **B4** | Derivar requisitos reais do reel/TMS a partir dos dados do tether | B3 | pendente |
 
@@ -2595,6 +2596,18 @@ Em repouso as duas sao indistinguiveis ate a quarta ou quinta casa. A flexao por
 Cada caso se repete com ate 0,4% em `\|F_uav\|`. Entre si, porem, as duas orientacoes de eixo da universal diferem **15,8% em `\|F_uav\|` e `\|e\|`** e **30–37% no desvio lateral**, sob perturbacao, geometria e massa identicas. Contra a ball, que e isotropica por construcao, a universal fica -3,5% (eixos a 0 graus) ou +11,8% (45 graus). A mecanica compativel: com flexoes de ~30 graus a parametrizacao em dois eixos ja e nao linear, e sem DOF de torcao o conjunto de formas alcancaveis depende de como os eixos foram escritos. Os picos do transitorio variaram entre repeticoes (a ball saturou numa corrida e nao na outra) e nao foram usados como evidencia.
 
 **Gate.** Estavel, sem aborto, RTF igual, sem NaN nem lacunas: sim. Flexibilidade 3D adequada e metricas fisicamente coerentes: **nao** — a forca no UAV muda 16% conforme um angulo sem significado fisico. Ganho de estabilidade sobre a ball: **nenhum observavel em N = 10**, onde as duas sao estaveis. **Status: FAIL** — a universal nao entrega o beneficio procurado e introduz um artefato de orientacao de eixos, menor que o das revolutes alternadas de C3, mas do mesmo tipo. N maiores nao foram testados, conforme a instrucao.
+
+#### X1 — Conexao fisica tether ↔ X500 (arquitetura da `dev`) — **FAIL**
+
+Analise completa em [`docs/TETHER_X500_CONNECTION_ANALYSIS.md`](TETHER_X500_CONNECTION_ANALYSIS.md). Resumo:
+
+- **A `dev` nao tem X500.** Seu drone (`meu_drone`) e controlado pelo proprio Gazebo, sem PX4 no lazo; a conexao do cabo e estatica, por juntas `ball` declaradas no SDF do **mundo**: tambor → raiz do cabo e ponta do cabo → `meu_drone::base_link`. O `tether_package` so fornece parametros e um gerador avulso nao usado.
+- **A `shared` conectava o drone por forca** (`TetherForceConstraint`), sem junta. Esta rodada reproduziu a arquitetura da `dev` com o X500: `tools/generate_x500_tether_world.py` gera `worlds/x500_tether_joint.sdf` com junta `ball` de mundo da ponta do cabo ao `base_link` do X500 (pivo no `tether_attach_link`), cabo `ball` sem plugin e reel estatico; o PX4 se liga ao X500 existente por `PX4_GZ_MODEL_NAME`.
+- **Estatico: PASS** em duas geometrias (0,5 e 1,2 m). **Vertical: FAIL** nas duas, com a junta integra ate o aborto do DART. **Horizontal: nao executado.**
+- **Controle:** a mesma geometria com a constraint de forca original **tambem aborta**, no mesmo evento — o ultimo trecho do cabo com colisoes saindo do solo durante a subida. Com junta rigida a carga vira o drone antes; com forca limitada o drone fica nivelado, mas o simulador cai igual.
+- **Correcao ao que foi afirmado antes:** as falhas em voo de B1, da visualizacao com N=10 e desta rodada tem em comum o cabo com colisoes apoiado no solo no inicio do voo; os voos que passaram nas rodadas A eram sem colisoes nos elos.
+
+Proximo passo recomendado: voar com o cabo pendurado sem contato com o solo (X500 decolando acima da guia) antes de qualquer nova troca de conexao ou de junta.
 
 #### B2 — escalabilidade com comprimento
 
