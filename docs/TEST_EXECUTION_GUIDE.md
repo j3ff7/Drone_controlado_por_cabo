@@ -1391,3 +1391,375 @@ interpretado. Analise: `docs/TETHER_CONNECTION_FORCE_VS_BALLJOINT.md`.
 Duas armadilhas corrigidas nesta rodada: o gravador escrevia so uma lista fixa de topicos (os
 novos eram recebidos e descartados), e um `wait` sem PID no script esperava tambem o PX4, que
 nao termina.
+
+## X500 + tether por `BallJoint` via wrapper no launch (sem modificar o PX4)
+
+Arquitetura, resultados e comparacao em `docs/X500_TETHER_BALL_JOINT_INTEGRATION.md`. O PX4 spawna
+um modelo wrapper gerado a cada execucao: `<include merge="true">` do `x500` original + `include`
+do `model://tether_cable` (portado da `dev`, em `src/pacote_do_drone/tether_package/models/tether_cable`) com pose
+`0 0 0.2` relativa ao `base_link` + junta `ball` `base_link` → `cabo_anexado::raiz_cabo`. Nenhum
+arquivo do PX4 e editado e nao ha overlay permanente. Sem carretel, sem ancora, sem plugin de
+forca; a integracao por plugin continua como estava.
+
+```bash
+cd /home/lima/codes/ic/drone-cabo
+unset GZ_SIM_RESOURCE_PATH PX4_GZ_MODEL_NAME PX4_GZ_MODEL_POSE   # o lancador monta o proprio caminho
+./tools/launch_x500_tether_ball.py --only-generate --print-env    # gera e valida (gz sdf -k)
+./tools/launch_x500_tether_ball.py                                # PX4 + Gazebo com GUI
+./tools/launch_x500_tether_ball.py --headless                     # sem GUI
+```
+
+Em outro terminal, depois de `Ready for takeoff!`:
+
+```bash
+gz model --list                                         # ground_plane, x500_tether_ball_0 (sem cabo duplicado)
+gz model -m x500_tether_ball_0 | grep -A4 drone_cabo_joint     # Type: ball, Parent Link: base_link
+./tools/record_x500_tether_ball.py --duration 30 --output-dir results/x500_tether_ball_shared/manual/estatico
+```
+
+Campanha (estrutura, estatico com captura da GUI, vertical, horizontal so se o vertical passar):
+
+```bash
+TIME_SCALE=3 tools/run_x500_tether_ball_campaign.sh ts3   # results/x500_tether_ball_shared/ts3/
+cat results/x500_tether_ball_shared/ts3/vertical/flight_metrics.json
+```
+
+Metricas: `dist_root_base_m` (integridade da junta, 0,2 m), `azimuth_deg`/`elevation_deg` do 1º
+segmento no frame do drone, `z_min_cable_m` (penetracao no solo), `sim_time_covered_s`, RTF; na
+analise do voo, dx realizado, erro de retorno, RMS XY/Z, roll/pitch e os angulos por fase.
+
+Cuidados:
+
+- **`TIME_SCALE`**: 72 elos com colisao deixam o RTF em 0,3–0,5, e a missao OFFBOARD conta tempo
+  de parede. Com `TIME_SCALE=1` a subida invade a janela de hover e o RMS Z nao significa nada.
+- **Penetracao no solo**: o cabo arrastado atravessa o solo (colisao de 1,5 mm); a analise reprova
+  `z_min < -5 mm`. Um voo com o cabo enterrado termina em chicote e aborto do DART ao arranca-lo.
+- Poses por `/world/default/dynamic_pose/info` (o `pose/info` nao atualiza links aninhados);
+  `gz sdf -p` omite os includes do wrapper sem erro.
+- GUI invisivel a partir de processo em segundo plano: `--headless` + `gz sim -g --render-engine-gui ogre`.
+
+### Resultado (rodada de 2026-09-14)
+
+- **Estrutura e estatico: PASS** nas duas campanhas. Modelo unico `x500_tether_ball_0`, junta `ball`
+  `base_link` → `cabo_anexado::raiz_cabo`, raiz ↔ `base_link` 0,2000008 m, elevacao do 1º segmento
+  ~-67 graus, `z_min` 1,4 mm, RTF 0,30–0,35. PX4 com 0 mudancas.
+- **Vertical (`ts3`): FAIL** so pela penetracao do cabo. Sem failsafe nem aborto, RMS XY 0,047 m,
+  RMS Z em hover 0,034 m, roll/pitch ≤ 1,9 graus, junta integra; `z_min` -173 mm no pouso.
+- **Horizontal: nao executado em `ts3`** (bloqueado pelo vertical). Na `baseline`, executado antes
+  do criterio de penetracao, partiu com o cabo enterrado e abortou
+  (`collision_space.cpp:460`, `aabbBound`).
+- A baseline de voo continua sendo o plugin de forca; o wrapper so e usado quando chamado.
+
+## Baseline oficial — tether por forca + angulos no frame do drone (guia do operador)
+
+Baseline consolidada em 2026-09-15. Documentacao tecnica (links, lei da forca, `t_hat_world`,
+`R_BW`, `t_hat_body`, convencoes, mascaras, requisito de 1 ms, limitacoes) em
+`docs/TETHER_FORCE_AND_ANGLE_MEASUREMENT.md`.
+
+| Item | Valor |
+| --- | --- |
+| Conexao drone–tether | `TetherForceConstraint` (forca na ponta de `tether_link_5`, reacao em `tether_attach_link`) |
+| Angulos | tangente local `t_hat_world` transformada `world → body` (`t_hat_body = R_BW t_hat_world`) |
+| Janela da tangente | 0,15 m (4 pontos) |
+| Cabo | N = 5, L = 2,5 m, `folded_ground`, colisao nos elos (raio 2,25 mm) |
+| Constraint | K = 5 N/m, C = 0,5 N·s/m, Fmax = 3 N |
+| Mascaras de colisao | X500 = 1, tether = 2, solo = 65535 (padrao) |
+| Passo de fisica | `max_step_size = 0.001 s` (copia do mundo `default` do PX4) |
+| Spawn do X500 | `PX4_GZ_MODEL=x500_tether_attach_mask`, `PX4_GZ_MODEL_POSE=0,0,0.24,0,0,0` |
+| Missoes | `--relative-altitude` |
+
+> **Nao use `make px4_sitl gz_x500` sozinho como procedimento.** Sem um mundo ja rodando, o PX4
+> inicia o `default.sdf` com passo de 4 ms, spawna o X500 sem mascara e na pose padrao — nao e a
+> configuracao validada (a 4 ms o cabo penetra 2,9 mm no pouso). O `make` so e usado depois que o
+> mundo de 1 ms esta de pe, e o PX4 se liga a ele (`gazebo already running world: default`).
+
+> **Atencao:** `tools/run_tether_attitude_bench.sh` e `tools/run_tether_angle_collision_campaign.sh`
+> encerram **todos** os processos `px4`, `gz` e `ruby` ao comecar e ao terminar. Nao rode uma
+> campanha com uma sessao manual aberta.
+
+### E0 — build e preparacao
+
+```bash
+cd /home/lima/codes/ic/drone-cabo
+
+./tools/build_tether_force_plugin.sh          # build/gz_plugins/libTetherForceConstraint.so (+ 3 plugins)
+
+(
+  cd px4/PX4-Autopilot
+  make px4_sitl                               # so compila; nao inicia a simulacao
+)
+
+python3 -m pytest -q -p no:cacheprovider test/
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src/pacote_do_drone:src/cabo_avaliacao \
+  python3 -m pytest -p no:cacheprovider -q \
+  src/pacote_do_drone/test/test_angulos_cabo.py src/cabo_avaliacao/test/test_cenarios.py
+
+# alguns testes regeneram modelos versionados: restaurar e conferir
+./tools/generate_x500_tether_world.py --drone-x 0.5
+./tools/generate_x500_tether_attach.py
+git status --short src/pacote_do_drone/models src/pacote_do_drone/worlds     # deve ficar vazio
+```
+
+### E1 — bancada de atitude (T0/T1, sem PX4)
+
+Corpo estatico no lugar do drone, cabo pendurado, uma sessao do Gazebo por atitude (~4 min):
+
+```bash
+tools/run_tether_attitude_bench.sh t1
+
+python3 tools/analyze_tether_attitude_bench.py \
+  --bench-dir results/tether_angles/bench/t1
+```
+
+Casos: `level`, `roll_p15`, `roll_m15`, `pitch_p15`, `pitch_m15`, `yaw_45`, `combined` (roll 10°,
+pitch -10°, yaw 30°). Um caso avulso: `tools/run_tether_attitude_bench.sh roll20 roll20:20:0:0`.
+Saidas em `results/tether_angles/bench/t1/<caso>/` (`plugin_*.csv`, `connection.csv`, `case.txt`,
+`aborts.txt`) e `t1_analysis.json`. Esperado: `T1 PASS`; `t_hat_world` igual entre atitudes
+(< 0,05°), `t_hat_body` = `R_BW t_hat_world` (< 0,01°).
+
+### E2 a E5 — campanhas automatizadas
+
+**B. Campanha de colisao** — C0 repouso, C1 arraste lento de 1 m a 0,1 m/s a 0,8 m, C2 voo e pouso:
+
+```bash
+STEP=0.001 \
+DRONE_MASK=1 \
+CABLE_MASK=2 \
+tools/run_tether_angle_collision_campaign.sh collision step1ms
+```
+
+**C. Campanha integrada** — **S0** estatico (30 s pousado), **S1** vertical (arm → takeoff → hover
+a 1,8 m → land → disarm), **S2** horizontal (hover → dx = 0,5 m → retorno → pouso):
+
+```bash
+STEP=0.001 \
+DRONE_MASK=1 \
+CABLE_MASK=2 \
+tools/run_tether_angle_collision_campaign.sh integrated step1ms
+```
+
+Cada etapa so roda se a anterior passou (`verdict.txt`). Os nomes antigos `colisao`/`integrado`
+continuam aceitos. Estrutura de `results/tether_angles/<collision|integrated>/<rotulo>/`:
+
+| Arquivo | Conteudo |
+| --- | --- |
+| `px4.log`, `gz.log` | logs do PX4 e do servidor do Gazebo |
+| `world/default.sdf` | mundo de 1 ms usado |
+| `drone_models/x500_tether_attach_mask/`, `model/` | X500 com mascara 1 e cabo com mascara 2 |
+| `verdict.txt`, `status.txt` | veredito por etapa; abortos, failsafe e passo |
+| `<etapa>/plugin_*.csv` | topicos `/cabo/*` gravados |
+| `<etapa>/connection_w{0.15,0.5,1.0}.csv` | poses, tangente Python por janela, penetracao no solo |
+| `<etapa>/px4_offboard_horizontal_mission.{csv,json}` | missao OFFBOARD |
+| `<etapa>/metrics.json` | metricas e veredito da etapa |
+
+Etapas: `C0_rest`, `C1_drag`, `C2_landing`, `S0_static`, `S1_vertical`, `S2_horizontal`.
+
+### E6 — analise e graficos
+
+```bash
+R=results/tether_angles/integrated/step1ms
+
+python3 tools/analyze_tether_angle_flight.py \
+  --run-dir "$R/S2_horizontal" \
+  --px4-log "$R/px4.log" \
+  "$R/gz.log"                                   # -> metrics.json (use --static no S0)
+
+python3 tools/analyze_tether_tangent_windows.py \
+  --run-dir "$R/S2_horizontal"                  # -> t2_windows.json (ultimo elo x janelas)
+
+python3 tools/plot_tether_attitude_series.py \
+  --run-dir "$R/S2_horizontal"                  # -> s3_series.svg, s3_series.csv, s3_metrics.json
+
+xdg-open "$R/S2_horizontal/s3_series.svg"       # roll/pitch/yaw, azimute e elevacao world x body
+```
+
+### Execucao manual com a GUI do Gazebo
+
+Tres terminais. Os resultados ficam em `results/tether_angles/manual/`.
+
+**Terminal 1 — modelos, mundo de 1 ms e Gazebo com GUI**
+
+```bash
+cd /home/lima/codes/ic/drone-cabo
+OUT=results/tether_angles/manual
+rm -rf $OUT && mkdir -p $OUT
+
+# 1. modelos com collision masks (copias em results/; os modelos versionados nao mudam)
+./tools/generate_x500_tether_attach.py --model-name x500_tether_attach_mask --collide-bitmask 1 \
+  --output-dir $OUT/drone_models/x500_tether_attach_mask
+./tools/generate_tether_anchor_chain.py --links 5 --length 2.5 --rho 0.06 --radius 0.003 \
+  --initial-axis folded_ground --force-constraint --stiffness 5 --damping 0.5 --max-force 3 \
+  --no-reel-actuator --link-collisions --collide-bitmask 2 --tangent-window 0.15 \
+  --drone-model x500_tether_attach_mask_0 --output-dir $OUT/model
+
+# 2. mundo default do PX4 com max_step_size = 0.001 s
+./tools/generate_px4_world_step.py --step 0.001 --output $OUT/world/default.sdf
+
+# 3. Gazebo com GUI (o servidor precisa enxergar o plugin, o X500 com mascara e os modelos do PX4)
+export GZ_SIM_SYSTEM_PLUGIN_PATH=$PWD/build/gz_plugins
+export GZ_SIM_RESOURCE_PATH=$PWD/$OUT/drone_models:$PWD/src/pacote_do_drone/models:$PWD/px4/PX4-Autopilot/Tools/simulation/gz/models:$PWD/px4/PX4-Autopilot/Tools/simulation/gz/worlds
+gz sim -r $OUT/world/default.sdf 2>&1 | tee $OUT/gz.log
+```
+
+Se a janela nao abrir, rode o servidor com `gz sim -s -r $OUT/world/default.sdf` e a GUI a parte,
+noutro terminal com o mesmo `GZ_SIM_RESOURCE_PATH`: `gz sim -g --render-engine-gui ogre`.
+
+**Terminal 2 — PX4 ligado ao mundo ja rodando**
+
+```bash
+cd /home/lima/codes/ic/drone-cabo
+OUT=$PWD/results/tether_angles/manual
+cd px4/PX4-Autopilot
+PX4_GZ_MODEL=x500_tether_attach_mask PX4_GZ_MODEL_POSE=0,0,0.24,0,0,0 \
+  make px4_sitl gz_x500 2>&1 | tee $OUT/px4.log
+# conferir no log: "gazebo already running world: default",
+# "Requested Model Position: 0,0,0.24,0,0,0" e depois "Ready for takeoff!"
+```
+
+**Terminal 3 — cabo, gravacao e missoes**
+
+```bash
+cd /home/lima/codes/ic/drone-cabo
+OUT=results/tether_angles/manual
+
+# spawn do cabo (estacao na origem, sob o drone)
+gz service -s /world/default/create --reqtype gz.msgs.EntityFactory --reptype gz.msgs.Boolean \
+  --timeout 10000 \
+  --req "sdf_filename: \"$PWD/$OUT/model/model.sdf\" name: \"tether_anchor_chain\" allow_renaming: false"
+
+# topicos ao vivo
+gz topic -e -t /cabo/conexao/angles_body     # azimute_body, elevacao_body, angulo forca x tangente
+gz topic -e -t /cabo/conexao/drone_rpy       # roll, pitch, yaw usados na transformacao
+
+# gravacao: topicos do plugin + poses com 3 janelas de tangente e penetracao no solo
+record() {  # $1 = diretorio, $2 = duracao [s]
+  mkdir -p "$1"
+  ./tools/record_tether_timeseries.py --duration "$2" --output-dir "$1" --prefix plugin > "$1/ts.log" 2>&1 &
+  for w in 0.15 0.5 1.0; do
+    ./tools/record_tether_connection.py --duration "$2" --output-dir "$1" --prefix "connection_w$w" \
+      --links 5 --segment-length 0.5 --settle 5 --tangent-window "$w" --collision-radius 0.00225 \
+      --drone-model x500_tether_attach_mask_0 > "$1/pose_w$w.log" 2>&1 &
+  done
+}
+
+# E2 — estatico (drone pousado, 30 s)
+record $OUT/static 30; wait
+python3 tools/analyze_tether_angle_flight.py --run-dir $OUT/static --px4-log $OUT/px4.log $OUT/gz.log --static
+
+# E3 — contato/arraste: 1 m a 0,1 m/s, 0,8 m acima do ponto de decolagem
+record $OUT/drag 80; sleep 3
+./tools/px4_offboard_horizontal_mission.py --output-dir $OUT/drag --rate 20 \
+  --dx 1.0 --altitude 0.8 --relative-altitude --xy-speed 0.1 \
+  --takeoff-hover 12 --move-hold 18 --return-hold 18 --land-stream 10
+wait
+python3 tools/analyze_tether_angle_flight.py --run-dir $OUT/drag --px4-log $OUT/px4.log $OUT/gz.log
+
+# E4 — voo vertical
+record $OUT/vertical 70; sleep 3
+./tools/px4_offboard_horizontal_mission.py --output-dir $OUT/vertical --rate 20 \
+  --dx 0.0 --altitude 1.8 --relative-altitude
+wait
+python3 tools/analyze_tether_angle_flight.py --run-dir $OUT/vertical --px4-log $OUT/px4.log $OUT/gz.log
+
+# E5 — voo horizontal (x local do PX4 = norte = +y do Gazebo)
+record $OUT/horizontal 70; sleep 3
+./tools/px4_offboard_horizontal_mission.py --output-dir $OUT/horizontal --rate 20 \
+  --dx 0.5 --altitude 1.8 --relative-altitude
+wait
+python3 tools/analyze_tether_angle_flight.py --run-dir $OUT/horizontal --px4-log $OUT/px4.log $OUT/gz.log
+
+# E6 — graficos e janelas
+python3 tools/plot_tether_attitude_series.py --run-dir $OUT/horizontal
+python3 tools/analyze_tether_tangent_windows.py --run-dir $OUT/horizontal
+```
+
+Cada missao arma, decola, pousa e desarma; espere `Disarmed by landing` no terminal 2 antes da
+proxima. Resultados: `results/tether_angles/manual/{static,drag,vertical,horizontal}/`
+(`metrics.json`, `s3_series.svg`, `t2_windows.json`, CSVs). Para encerrar: `Ctrl+C` nos terminais 2
+e 1.
+
+### Checklist do operador
+
+| Item | Como conferir (sessao manual; na campanha use `results/tether_angles/<modo>/<rotulo>/`) |
+| --- | --- |
+| [ ] PX4 spawn em z = 0,24 m | `grep "Requested Model Position" $OUT/px4.log` → `0,0,0.24,0,0,0`; `drone_z_inicial_m` ≈ 0,227 no `metrics.json` |
+| [ ] dt = 1 ms | `grep -o "max_step_size>[^<]*" $OUT/world/default.sdf` → `0.001`; `gz topic -e -n 1 -t /world/default/stats` → ~1000 `iterations` por segundo de `sim_time` |
+| [ ] X500 collision mask = 1 | `grep -c "<collide_bitmask>1<" $OUT/drone_models/x500_tether_attach_mask/model.sdf` → 9 |
+| [ ] tether collision mask = 2 | `grep -c "<collide_bitmask>2<" $OUT/model/model.sdf` → 5 |
+| [ ] solo collision mask = 65535 | `grep -c collide_bitmask $OUT/world/default.sdf` → 0 (padrao 65535) |
+| [ ] altitude relativa habilitada | `--relative-altitude` na linha da missao; `drone_z_max_m` ≈ 2,0–2,3 m nos voos de 1,8 m |
+| [ ] `/cabo/conexao/force` disponivel | `gz topic -l \| grep -x /cabo/conexao/force` |
+| [ ] `/cabo/conexao/t_hat_world` disponivel | `gz topic -l \| grep -x /cabo/conexao/t_hat_world` |
+| [ ] `/cabo/conexao/t_hat_body` disponivel | `gz topic -l \| grep -x /cabo/conexao/t_hat_body` |
+| [ ] `/cabo/conexao/angles_body` disponivel | `gz topic -l \| grep -x /cabo/conexao/angles_body` |
+| [ ] cabo nao colide com o proprio X500 | em repouso a ponta do cabo fica no solo: `python3 -c "import csv; print(list(csv.DictReader(open('$OUT/static/connection_w0.15.csv')))[-1]['tip_z'])"` ≈ 0,002 (e nao 0,26, que e a ponta apoiada na placa do X500); e `grep -c "<collide_bitmask>1<" .../x500_tether_attach_mask/model.sdf` = 9 |
+| [ ] cabo permanece sobre o solo | `penetracao_max_m` < 0,001 no `metrics.json` (criterio de PASS: ≤ 0,002) |
+| [ ] sem failsafe | `grep -ci failsafe $OUT/px4.log` → 0 |
+| [ ] sem crash DART | `grep -cE "Assertion\|Aborted" $OUT/px4.log $OUT/gz.log` → 0 |
+
+### Valores de referencia
+
+Da campanha que validou a baseline (`integrated/step1ms`, 2026-09-14). Sao referencia para detectar
+regressao, nao igualdade exata entre sessoes (a variacao entre sessoes ja observada e de decimos de
+milimetro na penetracao e alguns centimetros no rastreio).
+
+| Etapa | Grandeza | Referencia |
+| --- | --- | --- |
+| S0 | RTF | ≈ 0,982 |
+| S0 | penetracao no solo | ≈ 0 (0,02 µm) |
+| S1 | RMS XY | ≈ 0,047 m |
+| S1 | RMS Z em hover | ≈ 0,123 m |
+| S1 | roll / pitch max | ≈ 1,1° / 1,9° |
+| S1 | penetracao no solo | < 1 mm (0,74 mm) |
+| S1 | RTF | ≈ 0,979 |
+| S2 | dx comandado / realizado | 0,50 m / ≈ 0,469 m |
+| S2 | erro de retorno | ≈ 0,028 m |
+| S2 | roll / pitch max | ≈ 4,2° / 1,1° |
+| S2 | penetracao no solo | < 1 mm (0,47 mm) |
+| S2 | RTF | ≈ 0,978 |
+| S3 (S1, S2) | residuo `R_BW` p95 / plugin x poses p95 | 0° / ≈ 0,06° |
+| C1 / C2 | penetracao no solo | 0,59 mm / 0,56 mm |
+
+**Revalidacao na consolidacao (2026-09-15, rotulo `consolidated`, codigo e nomes do commit da
+baseline)** — `collision` e `integrated` a 1 ms, todas as etapas PASS, 0 aborto, 0 failsafe, 0 NaN,
+sem saturacao, PX4 com 0 mudancas antes e depois:
+
+| Etapa | Referencia (2026-09-14) | Revalidacao (2026-09-15) |
+| --- | --- | --- |
+| C1 arraste: penetracao / dx realizado / retorno | 0,59 mm / 0,94 m / 0,03 m | 0,40 mm / 0,97 m / 0,04 m |
+| C2 pouso: penetracao / RMS Z hover | 0,56 mm / 0,127 m | 0,88 mm / 0,129 m |
+| S0: RTF / penetracao | 0,982 / 0,02 µm | 0,982 / 0,02 µm |
+| S1: RMS XY / RMS Z hover | 0,047 / 0,123 m | 0,045 / 0,136 m |
+| S1: roll / pitch max / penetracao / RTF | 1,1° / 1,9° / 0,74 mm / 0,979 | 2,6° / 2,1° / 0,65 mm / 0,977 |
+| S2: dx comandado / realizado / retorno | 0,50 / 0,469 / 0,028 m | 0,50 / 0,538 / 0,060 m |
+| S2: RMS XY / RMS Z hover | 0,153 / 0,107 m | 0,153 / 0,109 m |
+| S2: roll / pitch max / penetracao / RTF | 4,2° / 1,1° / 0,47 mm / 0,978 | 4,4° / 2,7° / 0,81 mm / 0,978 |
+| `\|F\|` mediana (S1 / S2) | 1,04 / 0,37 N | 0,51 / 1,00 N |
+| S3: residuo `R_BW` p95 / plugin x poses p95 (S1; S2) | 0 / 0,06°; 0 / 0,06° | 0 / 0,07°; 0 / 0,05° |
+
+Entre sessoes a penetracao ficou sempre abaixo de 1 mm (0,40–0,88 mm), o dx realizado variou de
+0,47 a 0,54 m e o roll maximo de 1 a 4,4°; `|F|` mediano muda com o quanto do cabo fica suspenso em
+cada voo. Use a faixa, nao o valor exato.
+
+### Historico que levou a baseline (rodada de 2026-09-14)
+
+| Configuracao | C0 | C1 arraste | C2 pouso | S0 | S1 vertical | S2 horizontal |
+| --- | --- | --- | --- | --- | --- | --- |
+| sem filtro, 4 ms (`collision/baseline`) | PASS | **FAIL** — contato cabo x drone vira o X500, aborto DART | nao exec. | — | — | — |
+| filtro, 4 ms (`collision/mask`) | PASS | FAIL — penetracao 2,89 mm no pouso | nao exec. | — | — | — |
+| filtro, 2 ms (`step2ms`) | PASS | PASS (0,87 mm) | PASS (1,54 mm) | PASS | FAIL (2,02 mm, pousado) | nao exec. |
+| **filtro, 1 ms (`step1ms`)** | **PASS** | **PASS (0,59 mm)** | **PASS (0,56 mm)** | **PASS** | **PASS (0,74 mm)** | **PASS (0,47 mm)** |
+
+Cuidados que ficaram da investigacao:
+
+- **Spawn:** sem `PX4_GZ_MODEL_POSE=0,0,0.24` o PX4 spawna em z = 0 e o X500 assenta afundado, com o
+  attach abaixo do solo.
+- **Contato cabo x drone:** com colisao nos elos e sem mascaras, a folga da constraint deixa a ponta
+  do cabo sobre a placa do X500 e o ultimo elo cruza as caixas de colisao dos rotores girando.
+- **Contato no dartsim:** `kp`, `kd`, `max_vel` e `min_depth` nao sao lidos; as alavancas sao passo
+  de fisica e raio de colisao.
+- **Origem do EKF:** ja nasceu 1,14 m deslocada; por isso `--relative-altitude`.
+- **Direcao da forca:** com colisao ela fica a 24–160° da tangente; use `t_hat`, nao a forca, como
+  angulo do cabo.
+- **Gravacao:** um `Vector3d` todo zero chega vazio ao gravador de texto (`drone_rpy` nivelado em
+  bancada).

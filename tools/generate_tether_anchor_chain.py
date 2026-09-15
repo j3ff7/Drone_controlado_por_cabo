@@ -32,6 +32,40 @@ FIRST_LINK_PARENT = GROUND_EXIT_LINK
 OUT_SDF = OUT_DIR / 'model.sdf'
 OUT_CONFIG = OUT_DIR / 'model.config'
 
+# Tangente suavizada do cabo junto ao UAV publicada pelo TetherForceConstraint
+# (TetherGeometry.hh): comprimento de arco da janela a partir da ponta e numero de pontos.
+TANGENT_WINDOW = 0.15
+TANGENT_SAMPLES = 4
+
+# Colisao dos elos (so com --link-collisions). Padrao historico: cilindro de raio 0,75 * raio
+# visual ao longo do elo inteiro, sem <surface>. --collision-radius e os parametros de contato
+# so alteram o SDF quando passados.
+COLLISION_RADIUS = None
+SURFACE_XML = ''
+
+
+def collision_radius(radius):
+    return COLLISION_RADIUS if COLLISION_RADIUS is not None else 0.75 * radius
+
+
+def surface_xml(kp, kd, max_vel, min_depth, collide_bitmask=None):
+    """<surface><contact> dos elos. collide_bitmask: dois contatos so existem se (a & b) != 0.
+
+    O solo usa o padrao 65535. Com as colisoes do X500 em 1 e as do cabo em 2, o cabo colide com o
+    solo e nao com o drone. kp/kd/max_vel/min_depth: ignorados pelo gz-physics-dartsim.
+    """
+    fields = [(tag, value) for tag, value in (('kp', kp), ('kd', kd), ('max_vel', max_vel),
+                                              ('min_depth', min_depth)) if value is not None]
+    if not fields and collide_bitmask is None:
+        return ''
+    contact = ''
+    if collide_bitmask is not None:
+        contact += f'\n            <collide_bitmask>{collide_bitmask:d}</collide_bitmask>'
+    if fields:
+        body = ''.join(f'\n              <{tag}>{value:.9g}</{tag}>' for tag, value in fields)
+        contact += f'\n            <ode>{body}\n            </ode>'
+    return f'\n        <surface>\n          <contact>{contact}\n          </contact>\n        </surface>'
+
 
 def cylinder_inertia(mass, radius, length):
     i_transverse = mass * (3.0 * radius * radius + length * length) / 12.0
@@ -291,10 +325,10 @@ def folded_link_xml(index, n_links, link_length, mass, radius, relative_pose, li
         <pose>{com_pose}</pose>
         <geometry>
           <cylinder>
-            <radius>{0.75 * radius:.9g}</radius>
+            <radius>{collision_radius(radius):.9g}</radius>
             <length>{link_length:.9g}</length>
           </cylinder>
-        </geometry>
+        </geometry>{SURFACE_XML}
       </collision>'''
 
     joint_pose = '0 0 0 0 0 0' if index == 1 else f'{link_length:.9g} 0 0 0 0 0'
@@ -349,10 +383,10 @@ def link_xml(index, n_links, link_length, mass, radius, axis, link_collisions,
         <pose>{com_pose}</pose>
         <geometry>
           <cylinder>
-            <radius>{0.75 * radius:.9g}</radius>
+            <radius>{collision_radius(radius):.9g}</radius>
             <length>{link_length:.9g}</length>
           </cylinder>
-        </geometry>
+        </geometry>{SURFACE_XML}
       </collision>'''
 
     joint_pose = '0 0 0 0 0 0' if index == 1 else joint_offset
@@ -426,6 +460,8 @@ def force_constraint_plugin_xml(
       <stiffness>{stiffness:.9g}</stiffness>
       <damping>{damping:.9g}</damping>
       <max_force>{max_force:.9g}</max_force>
+      <tangent_window>{TANGENT_WINDOW:.9g}</tangent_window>
+      <tangent_samples>{TANGENT_SAMPLES:d}</tangent_samples>
     </plugin>'''
 
 
@@ -897,6 +933,7 @@ def generate(
 
 
 def main():
+    global OUT_DIR, OUT_SDF, OUT_CONFIG, TANGENT_WINDOW, TANGENT_SAMPLES, COLLISION_RADIUS, SURFACE_XML
     parser = argparse.ArgumentParser(description='Generate independent anchored tether model.')
     parser.add_argument('--links', type=int, required=True)
     parser.add_argument('--length', type=float, default=2.50)
@@ -917,6 +954,24 @@ def main():
     parser.add_argument('--stiffness', type=float, default=20.0)
     parser.add_argument('--damping', type=float, default=4.0)
     parser.add_argument('--max-force', type=float, default=20.0)
+    parser.add_argument('--tangent-window', type=float, default=TANGENT_WINDOW,
+                        help='janela [m] da tangente suavizada junto ao UAV (plugin de forca)')
+    parser.add_argument('--tangent-samples', type=int, default=TANGENT_SAMPLES,
+                        help='pontos da regressao da tangente suavizada')
+    parser.add_argument('--collision-radius', type=float, default=None,
+                        help='raio [m] do cilindro de colisao dos elos; padrao 0,75 * --radius')
+    # ATENCAO: o gz-physics-dartsim desta stack NAO le kp/kd/max_vel/min_depth (so friction/bounce);
+    # estes campos so tem efeito com outro motor de fisica. Mantidos para registro/experimento.
+    parser.add_argument('--contact-kp', type=float, default=None, help='<surface><contact><ode><kp>')
+    parser.add_argument('--contact-kd', type=float, default=None, help='<surface><contact><ode><kd>')
+    parser.add_argument('--contact-max-vel', type=float, default=None, help='<surface><contact><ode><max_vel>')
+    parser.add_argument('--contact-min-depth', type=float, default=None, help='<surface><contact><ode><min_depth>')
+    parser.add_argument('--collide-bitmask', type=int, default=None,
+                        help='<collide_bitmask> das colisoes dos elos (16 bits); 2 = so o solo, '
+                             'com o X500 gerado com mascara 1')
+    parser.add_argument('--output-dir', default=None,
+                        help='grava model.sdf/model.config aqui em vez do modelo versionado '
+                             '(bancadas nao sobrescrevem o arquivo rastreado)')
     parser.add_argument('--joint-type', choices=('ball', 'universal'), default='ball',
                         help='ball: baseline (3 DOF). universal: 2 DOF de flexao por conexao, '
                              'eixos y e z locais, sem torcao')
@@ -965,6 +1020,21 @@ def main():
     parser.add_argument('--payout-mass', type=float, default=0.0,
                         help='massa do elo de payout [kg]; 0 usa rho*span')
     args = parser.parse_args()
+    if args.output_dir:
+        OUT_DIR = Path(args.output_dir).resolve()
+        OUT_SDF = OUT_DIR / 'model.sdf'
+        OUT_CONFIG = OUT_DIR / 'model.config'
+    if args.tangent_window <= 0.0 or args.tangent_samples < 2:
+        raise SystemExit('tangent-window must be positive and tangent-samples >= 2')
+    TANGENT_WINDOW = args.tangent_window
+    TANGENT_SAMPLES = args.tangent_samples
+    if args.collision_radius is not None and args.collision_radius <= 0.0:
+        raise SystemExit('collision-radius must be positive')
+    COLLISION_RADIUS = args.collision_radius
+    if args.collide_bitmask is not None and not 0 <= args.collide_bitmask <= 0xFFFF:
+        raise SystemExit('collide-bitmask must fit in 16 bits')
+    SURFACE_XML = surface_xml(args.contact_kp, args.contact_kd, args.contact_max_vel,
+                              args.contact_min_depth, args.collide_bitmask)
     if args.links <= 0:
         raise SystemExit('links must be positive')
     if args.length <= 0.0:

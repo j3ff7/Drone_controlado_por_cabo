@@ -72,6 +72,67 @@ def roll_pitch_deg(q):
     return math.degrees(roll), math.degrees(pitch)
 
 
+def rpy_deg(q):
+    """(roll, pitch, yaw) em graus, R = Rz(yaw) Ry(pitch) Rx(roll) (convencao do gz-math)."""
+    x, y, z, w = q
+    roll, pitch = roll_pitch_deg(q)
+    yaw = math.degrees(math.atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z)))
+    return roll, pitch, yaw
+
+
+def point_at_arc(points, s):
+    """Ponto a comprimento de arco `s` de points[0] ao longo da poligonal (satura no fim)."""
+    remaining = max(0.0, s)
+    for a, b in zip(points, points[1:]):
+        length = math.dist(a, b)
+        if length > 0.0 and remaining <= length:
+            f = remaining / length
+            return tuple(a[i] + f * (b[i] - a[i]) for i in range(3))
+        remaining -= length
+    return tuple(points[-1])
+
+
+def smoothed_tangent(points, window, samples):
+    """Direcao unitaria que sai de points[0] ao longo do cabo, por regressao de P(s) em s.
+
+    Implementacao independente da do plugin (TetherGeometry.hh), mesma definicao:
+    s_i = i*w/(n-1) em [0, w], w = min(window, comprimento); d = sum (s_i - s_med)(p_i - p_med).
+    Devolve (t, janela usada) ou (None, 0) se degenerado.
+    """
+    total = sum(math.dist(a, b) for a, b in zip(points, points[1:]))
+    n = max(2, int(samples))
+    w = min(max(window, 0.0), total)
+    if len(points) < 2 or w <= 0.0:
+        return None, 0.0
+    s = [w * i / (n - 1) for i in range(n)]
+    p = [point_at_arc(points, si) for si in s]
+    s_mean = sum(s) / n
+    p_mean = [sum(pi[k] for pi in p) / n for k in range(3)]
+    d = [sum((s[i] - s_mean) * (p[i][k] - p_mean[k]) for i in range(n)) for k in range(3)]
+    norm = math.sqrt(sum(c * c for c in d))
+    if not norm > 1e-12:
+        return None, 0.0
+    return tuple(c / norm for c in d), w
+
+
+def angles_deg(t):
+    """(azimute, elevacao) em graus: azimute = atan2(ty, tx); elevacao = atan2(tz, hypot(tx, ty))."""
+    return (math.degrees(math.atan2(t[1], t[0])),
+            math.degrees(math.atan2(t[2], math.hypot(t[0], t[1]))))
+
+
+def world_to_body(q_wb, v):
+    """R_BW * v = q_WB^-1 * v."""
+    return quat_rotate(quat_conj(q_wb), v)
+
+
+def lowest_surface_z(a, b, radius):
+    """z mais baixo de um cilindro de raio `radius` com eixo de a ate b."""
+    length = math.dist(a, b)
+    dz = (b[2] - a[2]) / length if length > 0.0 else 0.0
+    return min(a[2], b[2]) - radius * math.sqrt(max(0.0, 1.0 - dz * dz))
+
+
 def parse_pose_block(block):
     """Um `pose {...}` do texto protobuf. Campos zero sao omitidos."""
     name = re.search(r'name: "([^"]+)"', block)
@@ -123,6 +184,11 @@ def main():
     parser.add_argument('--segment-length', type=float, required=True)
     parser.add_argument('--settle', type=float, default=5.0,
                         help='s simulados descartados no z_min "assentado"')
+    parser.add_argument('--tangent-window', type=float, default=0.15,
+                        help='janela [m] da tangente suavizada (mesma do plugin)')
+    parser.add_argument('--tangent-samples', type=int, default=4)
+    parser.add_argument('--collision-radius', type=float, default=0.0,
+                        help='raio da colisao dos elos [m] para a penetracao no solo; 0 = eixo')
     args = parser.parse_args()
 
     rows, stats = [], []
@@ -157,6 +223,21 @@ def main():
         roll, pitch = roll_pitch_deg(drone[1])
         last_world_q = quat_mul(tether[1], last_ori)
         t_body, azimuth, elevation = tether_angles(drone[1], last_world_q)
+        # Poligonal da ponta para a estacao: ponta, origem do elo N, ..., origem do elo 1.
+        chain = [compose(tether, poses[f'tether_link_{i}'][0])
+                 for i in range(args.links, 0, -1) if f'tether_link_{i}' in poses]
+        points = [tip] + chain
+        attach_q = quat_mul(drone[1], poses[args.drone_link][1])
+        _, _, yaw = rpy_deg(attach_q)
+        t_world, window_used = smoothed_tangent(points, args.tangent_window, args.tangent_samples)
+        if t_world is None:
+            t_world = (math.nan,) * 3
+        t_hat_body = world_to_body(attach_q, t_world)
+        az_w, el_w = angles_deg(t_world)
+        az_b, el_b = angles_deg(t_hat_body)
+        last_world = quat_rotate(last_world_q, (-1.0, 0.0, 0.0))
+        surface = min(lowest_surface_z(a, b, args.collision_radius)
+                      for a, b in zip(points, points[1:])) if len(points) > 1 else math.nan
         row = {'t_sim': t,
                'tip_x': tip[0], 'tip_y': tip[1], 'tip_z': tip[2],
                'attach_x': attach[0], 'attach_y': attach[1], 'attach_z': attach[2],
@@ -165,7 +246,16 @@ def main():
                'drone_x': drone[0][0], 'drone_y': drone[0][1], 'drone_z': drone[0][2],
                'roll_deg': roll, 'pitch_deg': pitch,
                'tan_body_x': t_body[0], 'tan_body_y': t_body[1], 'tan_body_z': t_body[2],
-               'azimuth_deg': azimuth, 'elevation_deg': elevation}
+               'azimuth_deg': azimuth, 'elevation_deg': elevation,
+               'yaw_deg': yaw, 'window_m': window_used,
+               't_world_x': t_world[0], 't_world_y': t_world[1], 't_world_z': t_world[2],
+               'azimuth_world_deg': az_w, 'elevation_world_deg': el_w,
+               't_hat_body_x': t_hat_body[0], 't_hat_body_y': t_hat_body[1],
+               't_hat_body_z': t_hat_body[2],
+               'azimuth_body_deg': az_b, 'elevation_body_deg': el_b,
+               'last_world_x': last_world[0], 'last_world_y': last_world[1],
+               'last_world_z': last_world[2],
+               'surface_z_min_m': surface}
         with lock:
             rows.append(row)
 
@@ -219,6 +309,15 @@ def main():
             'azimuth_deg': {'first': data[0]['azimuth_deg'], 'last': data[-1]['azimuth_deg']},
             'elevation_deg': {'first': data[0]['elevation_deg'], 'last': data[-1]['elevation_deg'],
                               'min': min(finite('elevation_deg')), 'max': max(finite('elevation_deg'))},
+            'surface_z_min_m': min(finite('surface_z_min_m')),
+            'surface_z_min_settled_m': min(finite('surface_z_min_m', settled)),
+            'penetration_max_m': max(0.0, -min(finite('surface_z_min_m'))),
+            'penetration_settled_max_m': max(0.0, -min(finite('surface_z_min_m', settled))),
+            'collision_radius_m': args.collision_radius,
+            'tangent_window_m': args.tangent_window, 'tangent_samples': args.tangent_samples,
+            'elevation_body_deg': {'min': min(finite('elevation_body_deg')),
+                                   'max': max(finite('elevation_body_deg'))},
+            'yaw_deg': {'min': min(finite('yaw_deg')), 'max': max(finite('yaw_deg'))},
         })
     if rtf:
         summary['rtf'] = {'mean': sum(rtf) / len(rtf), 'min': min(rtf), 'samples': len(rtf)}

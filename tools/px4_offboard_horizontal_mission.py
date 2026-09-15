@@ -186,14 +186,24 @@ class OffboardMission:
             row['e_xy'] = row['e_3d'] = None
         self.rows.append(row)
 
-    def run_phase(self, name, ref, duration):
+    def run_phase(self, name, ref, duration, start=None):
+        # Com --xy-speed > 0 e um ponto de partida, a referencia caminha de `start` ate `ref`
+        # nessa velocidade (tempo de parede) e depois fica parada; sem isso e um degrau.
         period = 1.0 / self.args.rate
-        deadline = time.monotonic() + duration
+        t0 = time.monotonic()
+        deadline = t0 + duration
+        speed = getattr(self.args, 'xy_speed', 0.0) or 0.0
         while time.monotonic() < deadline:
             before = time.monotonic()
             self.drain_messages()
-            self.send_setpoint(*ref)
-            self.record(name, ref)
+            current = ref
+            if start is not None and speed > 0.0:
+                dist = ((ref[0] - start[0]) ** 2 + (ref[1] - start[1]) ** 2) ** 0.5
+                frac = min(1.0, speed * (before - t0) / dist) if dist > 0.0 else 1.0
+                current = (start[0] + frac * (ref[0] - start[0]),
+                           start[1] + frac * (ref[1] - start[1]), ref[2], ref[3])
+            self.send_setpoint(*current)
+            self.record(name, current)
             if self.heartbeat and self.heartbeat.system_status == mavutil.mavlink.MAV_STATE_CRITICAL:
                 self.mission_failed = True
                 self.failure_reason = 'heartbeat system_status CRITICAL'
@@ -205,16 +215,20 @@ class OffboardMission:
         self.wait_ready()
         initial = self.local_position
         yaw = self.attitude.yaw if self.attitude else 0.0
-        home = (initial.x, initial.y, -abs(self.args.altitude), yaw)
-        shifted = (initial.x + self.args.dx, initial.y + self.args.dy, -abs(self.args.altitude), yaw)
+        # Sem --relative-altitude a altitude e absoluta no frame local do EKF, cuja origem pode
+        # nascer deslocada do solo (ja visto +1,14 m); com a opcao ela conta a partir do z inicial.
+        z_target = (initial.z - abs(self.args.altitude)) if getattr(self.args, 'relative_altitude', False) \
+            else -abs(self.args.altitude)
+        home = (initial.x, initial.y, z_target, yaw)
+        shifted = (initial.x + self.args.dx, initial.y + self.args.dy, z_target, yaw)
 
         self.run_phase('prestream', home, self.args.prestream)
         self.set_offboard()
         self.run_phase('offboard_settle', home, self.args.offboard_settle)
         self.arm()
         self.run_phase('climb_hover', home, self.args.takeoff_hover)
-        self.run_phase('translate_out', shifted, self.args.move_hold)
-        self.run_phase('return_home', home, self.args.return_hold)
+        self.run_phase('translate_out', shifted, self.args.move_hold, start=home)
+        self.run_phase('return_home', home, self.args.return_hold, start=shifted)
         self.land()
         self.run_phase('land_stream', home, self.args.land_stream)
         return self.summary()
@@ -291,6 +305,10 @@ def main():
     parser.add_argument('--altitude', type=float, default=2.0)
     parser.add_argument('--dx', type=float, default=0.5)
     parser.add_argument('--dy', type=float, default=0.0)
+    parser.add_argument('--relative-altitude', action='store_true',
+                        help='altitude medida a partir do z local inicial (e nao da origem do EKF)')
+    parser.add_argument('--xy-speed', type=float, default=0.0,
+                        help='rampa da referencia horizontal [m/s]; 0 = degrau (padrao)')
     parser.add_argument('--output-dir', default='results/offboard_horizontal')
     args = parser.parse_args()
 

@@ -2011,6 +2011,8 @@ O reel/TMS sai da dinamica principal ate B1–B4 terminarem. O modelo de produca
 | **U1** | `UniversalJoint` no lugar de `BallJoint`, N=10 | C1–C4 | **FAIL** — igual a ball em repouso, anisotropia de 16% sob carga lateral |
 | **X1** | Conexao fisica tether ↔ X500 (arquitetura da `dev`) | U1 | **FAIL** — estatico PASS; vertical aborta quando o cabo descola do solo (a constraint de forca tambem) |
 | **X2** | Conexao por forca x `BallJoint` para medir angulos do cabo | X1 | **manter plugin de forca** + medicao geometrica de tangente/azimute/elevacao (validada contra poses) |
+| **X3** | PX4 + X500 + cabo da `dev` por `BallJoint`, wrapper no launch (PX4 intocado) | X2 | **estatico PASS; vertical FAIL** (voo limpo, cabo atravessa o solo no pouso); horizontal bloqueado; plugin de forca segue como baseline de voo |
+| **X4** | Plugin de forca + angulos do tether no frame do drone + colisao tether–solo | X3 | **PASS** com filtro cabo x drone e passo de 1 ms: T0/T1, C0–C2, S0–S2 e S3; sem filtro o contato cabo–drone derruba o voo; a 4 ms e 2 ms a penetracao no pouso passa do limite |
 | **B3** | Validacao dinamica de poucas configuracoes representativas | B2 | pendente |
 | **B4** | Derivar requisitos reais do reel/TMS a partir dos dados do tether | B3 | pendente |
 
@@ -2614,6 +2616,62 @@ Proximo passo recomendado: voar com o cabo pendurado sem contato com o solo (X50
 
 Analise em [`docs/TETHER_CONNECTION_FORCE_VS_BALLJOINT.md`](TETHER_CONNECTION_FORCE_VS_BALLJOINT.md). O plugin `TetherForceConstraint` passou a publicar a tangente do ultimo elo, azimute, elevacao e a forca no frame do drone (`/cabo/conexao/tangent_body`, `/cabo/conexao/angles`, `/cabo/conexao/force_body`). Estatico e voo vertical com a baseline das rodadas A: a medicao concorda com o calculo independente pelas poses em 0,02–0,06 grau (mediana), o voo cobre 69,7 de 70 s sem aborto nem failsafe, e a forca da conexao fica a 0,5–0,7 grau (mediana) da tangente. **Decisao: manter a conexao por forca.** A `BallJoint` nao acrescenta informacao de angulo, tiraria a medida direta de forca e ja mostrou risco numerico na X1. Limitacao: com o cabo quase vertical o azimute e mal condicionado, com qualquer metodo.
 
+#### X3 — PX4 + X500 + tether por `BallJoint` via wrapper no launch — **estatico PASS, vertical FAIL**
+
+Analise em [`docs/X500_TETHER_BALL_JOINT_INTEGRATION.md`](X500_TETHER_BALL_JOINT_INTEGRATION.md).
+
+- **Diagnostico corrigido:** a `dev` integra PX4 + X500 + cabo + `BallJoint` editando o `x500/model.sdf` **dentro do PX4**, fora do Git.
+- **Porte para a `shared` sem tocar no PX4:**
+  - `tools/launch_x500_tether_ball.py` gera um wrapper com `<include merge="true">` do `x500` original, `include` de `model://tether_cable` com pose `0 0 0.2` relativa ao `base_link` e junta `ball` `base_link` → `cabo_anexado::raiz_cabo`.
+  - O PX4 spawna o wrapper por `PX4_GZ_MODEL=x500_tether_ball`.
+  - O cabo foi copiado byte a byte da `dev` para `tether_package/models/tether_cable`: 70 × 0,05 m, juntas `universal`, colisao de 1,5 mm.
+  - O gz-sim 7.9 nao cria juntas `ball` entre modelos ja spawnados, entao a composicao antes do spawn e necessaria.
+- **Estrutura e estatico: PASS** duas vezes.
+  - Modelo unico `x500_tether_ball_0`, IMU do PX4 presente.
+  - Raiz ↔ `base_link` 0,2000008 m, elevacao do 1º segmento ~-67 graus, `z_min` 1,4 mm.
+  - RTF 0,30–0,35: fisica monothread saturada pelos 72 elos com colisao.
+- **Vertical (fases da missao x3): FAIL** so pela penetracao do cabo no solo.
+  - Voo limpo: sem failsafe nem aborto, RMS Z em hover 0,034 m, RMS XY 0,047 m, roll/pitch ≤ 1,9 graus.
+  - Junta integra: 0,2000 m em todas as amostras.
+  - O cabo chega a -173 mm no pouso e a -5 mm quando arrastado na subida.
+- **Horizontal: bloqueado.** A unica corrida horizontal partiu com o cabo enterrado por um pouso anterior e abortou ao arranca-lo (`collision_space.cpp:460`).
+- **Achado de ferramenta:** a missao OFFBOARD conta tempo de parede. Com RTF < 1 as fases encolhem em tempo simulado e o `rms_z_hover_m` passa a medir a subida. A campanha ganhou `TIME_SCALE`, e a analise ganhou `rms_z_hold_m` e o criterio `cabo_sem_penetrar_solo`.
+
+**Decisao:** o wrapper e o metodo de integracao adotado para a `BallJoint`, mas o plugin de forca continua como baseline de voo. Proximo bloqueio: o contato cabo–solo do modelo da `dev`.
+
+#### X4 — Plugin de forca + medicao angular no frame do drone + colisao tether–solo — **PASS**
+
+Analise em [`docs/TETHER_FORCE_AND_ANGLE_MEASUREMENT.md`](TETHER_FORCE_AND_ANGLE_MEASUREMENT.md).
+
+- **Arquitetura confirmada:**
+  - forca em `tether_anchor_chain::tether_link_5` (ponta, `tether_offset` 0,5 m) e reacao em `x500_tether_attach_0::tether_attach_link` (`base_link` − 0,12 m, junta fixed);
+  - cadeia `ground_station_base → tether_exit_point → tether_link_1..5` com juntas ball;
+  - K = 5 N/m, C = 0,5 N.s/m, Fmax = 3 N.
+- **Medicao nova (so leitura):** `TetherGeometry.hh`. Tangente por regressao de P(s) numa janela de 0,15 m a partir da ponta; `t_hat_body = R_BW t_hat_world` com a atitude atual do `tether_attach_link`. Topicos `/cabo/conexao/{t_hat_world,t_hat_body,angles_body,angles_world,drone_rpy,t_hat_world_last_link}`; os antigos ficaram iguais.
+- **T0/T1 PASS**, bancada com corpo estatico em 7 atitudes (±15°, yaw 45°, combinada):
+  - `t_hat_world` invariante a ≤ 0,007°;
+  - `t_hat_body` igual a `R_BW t_hat_world` a ≤ 0,0015°;
+  - previsao no corpo ≤ 0,007°;
+  - plugin x Python ≤ 0,003°.
+- **T2:** com elos de 0,5 m, a janela local e o proprio ultimo elo (diferenca 0,000°); uma janela de 1,0 m reduz o jitter mas enviesa 15–65°. Manter 0,15 m.
+- **Colisao, uma mudanca por vez:**
+  - *Sem filtro:* o C1 (arraste) vira o drone e aborta o DART. Com colisao, a folga da constraint poe a ponta do cabo sobre a placa do X500 e o ultimo elo cruza placa e rotores.
+  - *Filtro `collide_bitmask`* (X500 1, cabo 2, solo 65535): voo limpo, mas 2,89 mm de penetracao no pouso a 4 ms.
+  - *Passo de 2 ms:* C0–C2 PASS, mas S1 com 2,02 mm (1,5–2,0 mm entre sessoes, sem robustez).
+  - *Passo de 1 ms:* C0–C2 PASS (maximo 0,59 mm) e S0–S2 PASS (maximo 0,74 mm), RTF 0,98.
+  - O dartsim desta stack nao le `kp`/`kd` de contato.
+- **Voos a 1 ms:**
+  - S1 vertical: RMS XY 0,047 m, RMS Z em hover 0,123 m.
+  - S2 horizontal: dx 0,50 → 0,469 m, retorno 0,028 m, roll ≤ 4,2°.
+  - Ambos: sem saturacao, NaN, failsafe ou aborto.
+- **S3 PASS:** residuo da transformacao p95 = 0 e plugin x poses p95 0,06°; com roll de ±4,5° a elevacao no corpo difere da do mundo em ate 3,3°, como previsto.
+- **Achados de ferramenta:**
+  - o spawn sem `PX4_GZ_MODEL_POSE` afunda o X500 (attach abaixo do solo);
+  - a origem do EKF nasceu 1,14 m deslocada, o que motivou `--relative-altitude`;
+  - com colisao, a direcao da forca nao e proxy do angulo do cabo (24–160° da tangente).
+
+**Decisao:** plugin de forca como baseline, com o angulo do tether pela tangente geometrica no frame do drone. Voos com cabo com colisao usam filtro cabo x drone, passo de 1 ms, spawn a z = 0,24 e altitude relativa.
+
 #### B2 — escalabilidade com comprimento
 
 Aumentar `L` mantendo `l` aproximadamente constante no valor escolhido em B1. **Nao** manter `N` fixo ao aumentar `L`: isso misturaria efeito de comprimento com erro de discretizacao. Exemplo com `l = 0,125 m`:
@@ -2899,6 +2957,12 @@ Uma sessão futura deve ler este documento, `AGENTS.md` e as fontes da fase; con
 **Proxima arquitetura recomendada: modelo nodal / plugin de cabo proprio** (particulas com restricao de distancia), pelas razoes medidas em C.next. Nenhuma escolha de junta pode mover o teto de `N`, porque o teto nao e da junta.
 
 **Restauracao pos-C: PASS (com ressalva de voo).** O codigo das revolutes foi removido e o gerador volta a emitir exatamente o SDF anterior. Estatico `N = 20` com colisoes e `taut` reproduz a baseline na quarta casa. Em voo, porem, `N = 20` aborta 3 de 3 vezes apos a decolagem — e a corrida de B1 dada como aprovada tambem tinha abortado, sem que a ferramenta de missao percebesse. `N = 5` sem colisoes voa limpo. Detalhes em **Restauracao pos-C**.
+
+**X3 concluida: estatico PASS, vertical FAIL.** A `BallJoint` da `dev` entrou na `shared` por um wrapper gerado no launch (`tools/launch_x500_tether_ball.py`), sem editar o PX4 nem manter overlay. A junta ficou integra em todas as corridas. O voo vertical com fases em escala e limpo, mas o cabo da `dev` atravessa o solo no pouso (-173 mm), e o horizontal fica bloqueado. A baseline de voo continua sendo o plugin de forca. Detalhes em **X3**.
+
+**X4 concluida: PASS.** Com o plugin de forca como baseline, a direcao do tether passou a ser medida por tangente geometrica junto ao UAV e transformada para o frame do drone com a atitude real (`/cabo/conexao/angles_body`); a bancada T1 e os voos S3 demonstram a compensacao. Com colisao nos elos, os voos vertical e horizontal passam com filtro cabo x drone e passo de fisica de 1 ms (penetracao maxima 0,74 mm, RTF 0,98). Detalhes em **X4**.
+
+**Baseline oficial (consolidada em 2026-09-15, `origin/shared`):** `TetherForceConstraint` (N = 5, L = 2,5 m, K = 5 N/m, C = 0,5 N·s/m, Fmax = 3 N) + angulos do tether pela tangente local (janela 0,15 m) transformada `world → body` + colisao cabo–solo com collision masks (X500 = 1, tether = 2, solo = 65535) + `max_step_size` = 0,001 s + spawn `PX4_GZ_MODEL_POSE=0,0,0.24,0,0,0` + missoes com altitude relativa. Procedimento do operador em `docs/TEST_EXECUTION_GUIDE.md` (secao "Baseline oficial"); parte tecnica em `docs/TETHER_FORCE_AND_ANGLE_MEASUREMENT.md`.
 
 **Recomendacao anterior, agora superada:** A7 — payout/retraction e comprimento variavel. Ver o roadmap A5–A9. A6 entregou um atuador com limites verificados e um estimador de torque conferido contra ele; falta acoplar `theta_reel` ao comprimento liberado. Ressalvas herdadas: `friction = 0` no `reel_joint` (o estimador nao foi exercitado com atrito de Coulomb), a guarda de `omega_max` e liga-desliga, e o balanco de corpo livre de `T_est` deixa de fechar se as colisoes dos segmentos forem habilitadas.
 

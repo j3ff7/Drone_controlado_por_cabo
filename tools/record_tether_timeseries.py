@@ -210,6 +210,14 @@ def main():
         'tangent_body': TopicRecorder('/cabo/conexao/tangent_body', Vector3dStreamParser, stop_event),
         'angles': TopicRecorder('/cabo/conexao/angles', Vector3dStreamParser, stop_event),
         'force_body': TopicRecorder('/cabo/conexao/force_body', Vector3dStreamParser, stop_event),
+        # tangente suavizada e compensacao de atitude (TetherGeometry.hh)
+        't_hat_world': TopicRecorder('/cabo/conexao/t_hat_world', Vector3dStreamParser, stop_event),
+        't_hat_body': TopicRecorder('/cabo/conexao/t_hat_body', Vector3dStreamParser, stop_event),
+        'angles_body': TopicRecorder('/cabo/conexao/angles_body', Vector3dStreamParser, stop_event),
+        'angles_world': TopicRecorder('/cabo/conexao/angles_world', Vector3dStreamParser, stop_event),
+        'drone_rpy': TopicRecorder('/cabo/conexao/drone_rpy', Vector3dStreamParser, stop_event),
+        't_hat_world_last_link': TopicRecorder('/cabo/conexao/t_hat_world_last_link',
+                                               Vector3dStreamParser, stop_event),
         'world': TopicRecorder('/stats', WorldStatsStreamParser, stop_event),
     }
     for recorder in recorders.values():

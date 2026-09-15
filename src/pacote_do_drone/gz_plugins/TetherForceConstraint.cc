@@ -25,6 +25,8 @@
 #include <gz/transport/Node.hh>
 #include <sdf/Element.hh>
 
+#include "TetherGeometry.hh"
+
 namespace drone_cabo
 {
 class TetherForceConstraint:
@@ -64,6 +66,15 @@ class TetherForceConstraint:
     this->tangentBodyPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/tangent_body");
     this->anglesPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/angles");
     this->forceBodyPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/force_body");
+    this->tangentWindow = this->Read<double>(_sdf, "tangent_window", 0.15);
+    this->tangentSamples = this->Read<int>(_sdf, "tangent_samples", 4);
+    this->tHatWorldPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/t_hat_world");
+    this->tHatBodyPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/t_hat_body");
+    this->anglesBodyPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/angles_body");
+    this->anglesWorldPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/angles_world");
+    this->droneRpyPub = this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/drone_rpy");
+    this->lastLinkWorldPub =
+        this->node.Advertise<gz::msgs::Vector3d>("/cabo/conexao/t_hat_world_last_link");
   }
 
   public: void PreUpdate(
@@ -79,6 +90,13 @@ class TetherForceConstraint:
     auto dronePose = this->droneLink.WorldPose(_ecm);
     auto tetherPose = this->tetherLink.WorldPose(_ecm);
     auto droneVel = this->droneLink.WorldLinearVelocity(_ecm, this->droneOffset);
+    // Bancada de atitude: um corpo ESTATICO no lugar do drone nao recebe WorldPose nem
+    // velocidade da fisica. Compomos a pose pela arvore e usamos velocidade zero; com o
+    // X500 dinamico os componentes existem e nada muda.
+    if (!dronePose)
+      dronePose = gz::sim::worldPose(this->droneLink.Entity(), _ecm);
+    if (!droneVel)
+      droneVel = gz::math::Vector3d(0, 0, 0);
     auto tetherVel = this->tetherLink.WorldLinearVelocity(_ecm, this->tetherOffset);
     if (!dronePose || !tetherPose || !droneVel || !tetherVel)
       return;
@@ -126,6 +144,85 @@ class TetherForceConstraint:
     this->PublishExitPose(_ecm);
     this->PublishReelState(_ecm);
     this->PublishGroundTension(_info, _ecm, forceOnTether);
+    this->PublishSmoothedTangent(_ecm, *dronePose, pTether, forceOnTether);
+  }
+
+  // Tangente suavizada junto ao UAV (TetherGeometry.hh) e sua compensacao de atitude.
+  //
+  //   poligonal: P0 = ponta do cabo (tether_link_N + tether_offset), P1 = origem de
+  //              tether_link_N, P2 = origem de tether_link_{N-1}, ..., tether_link_1
+  //   t_hat_world = regressao de P(s) em s in [0, tangent_window], tangent_samples pontos
+  //   t_hat_body  = R_BW * t_hat_world = q_WB^-1 * t_hat_world, com q_WB a orientacao
+  //                 atual do link do drone (tether_attach_link), sem supor atitude nula
+  //
+  // Topicos (gz.msgs.Vector3d, frames FLU do Gazebo):
+  //   /cabo/conexao/t_hat_world            t_hat_world
+  //   /cabo/conexao/t_hat_body             t_hat_body
+  //   /cabo/conexao/angles_body            (azimute_body, elevacao_body, angulo forca x t_hat) [graus]
+  //   /cabo/conexao/angles_world           (azimute_world, elevacao_world, janela usada [m])
+  //   /cabo/conexao/drone_rpy              (roll, pitch, yaw) do link do drone [graus]
+  //   /cabo/conexao/t_hat_world_last_link  -R_N (1,0,0): so o ultimo elo, para comparacao
+  // So leitura: nada aqui altera a dinamica. Os topicos antigos (tangent_body, angles)
+  // continuam publicando a medida pelo ultimo elo.
+  private: void PublishSmoothedTangent(
+      gz::sim::EntityComponentManager &_ecm,
+      const gz::math::Pose3d &_drone,
+      const gz::math::Vector3d &_tip,
+      const gz::math::Vector3d &_forceOnTether)
+  {
+    if (!this->tetherResolved)
+      return;
+    const size_t count = std::min(this->tetherLinks.size(),
+                                  static_cast<size_t>(std::max(this->tetherLinkCount, 0)));
+    std::vector<gz::math::Vector3d> points;
+    points.reserve(count + 1);
+    points.push_back(_tip);
+    gz::math::Quaterniond lastLinkRot;
+    for (size_t k = count; k >= 1; --k)
+    {
+      auto pose = this->tetherLinks[k - 1].WorldPose(_ecm);
+      if (!pose)
+        return;
+      if (k == count)
+        lastLinkRot = pose->Rot();
+      points.push_back(pose->Pos());
+    }
+
+    const auto estimate =
+        geometry::SmoothedTangent(points, this->tangentWindow, this->tangentSamples);
+    if (!estimate.valid)
+      return;
+
+    const gz::math::Vector3d tWorld = estimate.direction;
+    const gz::math::Vector3d tBody = geometry::WorldToBody(_drone.Rot(), tWorld);
+    const gz::math::Vector3d angWorld = geometry::AzimuthElevationDeg(tWorld);
+    const gz::math::Vector3d angBody = geometry::AzimuthElevationDeg(tBody);
+    const gz::math::Vector3d rpy = geometry::RollPitchYawDeg(_drone.Rot());
+    const gz::math::Vector3d lastLink =
+        (-lastLinkRot.RotateVector(gz::math::Vector3d(1, 0, 0))).Normalized();
+
+    double misalignment = std::numeric_limits<double>::quiet_NaN();
+    const gz::math::Vector3d forceOnDrone = -_forceOnTether;
+    if (forceOnDrone.Length() > 1e-9)
+    {
+      const double c = tWorld.Dot(forceOnDrone.Normalized());
+      misalignment = std::acos(std::clamp(c, -1.0, 1.0)) * 180.0 / M_PI;
+    }
+
+    auto publish = [](gz::transport::Node::Publisher &_pub, double _x, double _y, double _z)
+    {
+      gz::msgs::Vector3d msg;
+      msg.set_x(_x);
+      msg.set_y(_y);
+      msg.set_z(_z);
+      _pub.Publish(msg);
+    };
+    publish(this->tHatWorldPub, tWorld.X(), tWorld.Y(), tWorld.Z());
+    publish(this->tHatBodyPub, tBody.X(), tBody.Y(), tBody.Z());
+    publish(this->anglesBodyPub, angBody.X(), angBody.Y(), misalignment);
+    publish(this->anglesWorldPub, angWorld.X(), angWorld.Y(), estimate.window);
+    publish(this->droneRpyPub, rpy.X(), rpy.Y(), rpy.Z());
+    publish(this->lastLinkWorldPub, lastLink.X(), lastLink.Y(), lastLink.Z());
   }
 
   private: template <typename T>
@@ -533,6 +630,14 @@ class TetherForceConstraint:
   private: gz::transport::Node::Publisher tangentBodyPub;
   private: gz::transport::Node::Publisher anglesPub;
   private: gz::transport::Node::Publisher forceBodyPub;
+  private: double tangentWindow{0.15};
+  private: int tangentSamples{4};
+  private: gz::transport::Node::Publisher tHatWorldPub;
+  private: gz::transport::Node::Publisher tHatBodyPub;
+  private: gz::transport::Node::Publisher anglesBodyPub;
+  private: gz::transport::Node::Publisher anglesWorldPub;
+  private: gz::transport::Node::Publisher droneRpyPub;
+  private: gz::transport::Node::Publisher lastLinkWorldPub;
 };
 }
 

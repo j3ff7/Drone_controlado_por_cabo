@@ -67,25 +67,42 @@ def attach_block(offset_z, mass, inertia, visual_radius, collision_radius):
 '''
 
 
-def generate(offset_z, mass, inertia, visual_radius, collision_radius):
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+def add_collide_bitmask(sdf, bitmask):
+    """Poe <collide_bitmask> em todas as colisoes do X500 (cada uma ja tem <surface><contact>).
+
+    Contatos so existem se (mascara_a & mascara_b) != 0. O solo usa 65535; com o drone em 1 e o
+    cabo em 2 (generate_tether_anchor_chain.py --collide-bitmask 2) o cabo nao colide com o drone.
+    """
+    collisions = sdf.count('<collision ')
+    contacts = sdf.count('<contact>')
+    if collisions == 0 or contacts != collisions or '<collide_bitmask>' in sdf:
+        raise SystemExit(f'x500 upstream inesperado: {collisions} colisoes, {contacts} <contact>')
+    return sdf.replace('<contact>', f'<contact>\n            <collide_bitmask>{bitmask:d}</collide_bitmask>')
+
+
+def generate(offset_z, mass, inertia, visual_radius, collision_radius,
+             model_name=MODEL_NAME, out_dir=OUT_DIR, collide_bitmask=None):
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     sdf = PX4_X500_SDF.read_text()
     if "<model name='x500'>" in sdf:
-        sdf = sdf.replace("<model name='x500'>", f"<model name='{MODEL_NAME}'>", 1)
+        sdf = sdf.replace("<model name='x500'>", f"<model name='{model_name}'>", 1)
     else:
-        sdf = sdf.replace('<model name="x500">', f'<model name="{MODEL_NAME}">', 1)
+        sdf = sdf.replace('<model name="x500">', f'<model name="{model_name}">', 1)
     if f'name="{ATTACH_LINK}"' in sdf:
         raise SystemExit(f'modelo upstream ja define {ATTACH_LINK}; abortando')
     if ANCHOR_IN_SDF not in sdf:
         raise SystemExit('nao foi possivel localizar <link name="rotor_0"> no x500 upstream')
 
+    if collide_bitmask is not None:
+        sdf = add_collide_bitmask(sdf, collide_bitmask)
     block = attach_block(offset_z, mass, inertia, visual_radius, collision_radius)
     sdf = sdf.replace(ANCHOR_IN_SDF, block + ANCHOR_IN_SDF, 1)
-    (OUT_DIR / 'model.sdf').write_text(sdf)
+    (out_dir / 'model.sdf').write_text(sdf)
 
     config = PX4_X500_CONFIG.read_text()
-    config = config.replace('<name>x500</name>', f'<name>{MODEL_NAME}</name>', 1)
+    config = config.replace('<name>x500</name>', f'<name>{model_name}</name>', 1)
     config = re.sub(
         r'<description>.*?</description>',
         (
@@ -99,9 +116,9 @@ def generate(offset_z, mass, inertia, visual_radius, collision_radius):
         count=1,
         flags=re.DOTALL,
     )
-    (OUT_DIR / 'model.config').write_text(config)
+    (out_dir / 'model.config').write_text(config)
 
-    print(f'modelo={MODEL_NAME}')
+    print(f'modelo={model_name}')
     print(f'attach_link={ATTACH_LINK}')
     print(f'attach_joint={ATTACH_JOINT} (fixed, base_link -> {ATTACH_LINK})')
     print(f'pose_relativa_base_link=0 0 {offset_z:.9g} 0 0 0')
@@ -109,7 +126,8 @@ def generate(offset_z, mass, inertia, visual_radius, collision_radius):
     print(f'inercia_attach={inertia:.9g} kg.m^2')
     print(f'colisao_attach={"sim" if collision_radius > 0 else "nao"}')
     print(f'cabo_embutido=nao')
-    print(f'sdf={OUT_DIR / "model.sdf"}')
+    print(f'collide_bitmask={collide_bitmask if collide_bitmask is not None else "padrao (65535)"}')
+    print(f'sdf={out_dir / "model.sdf"}')
 
 
 def main():
@@ -123,8 +141,17 @@ def main():
     # esfera 0,12 m abaixo do base_link fica sob o trem de pouso e introduz um
     # contato com o solo que a baseline A0.2 nao tinha.
     parser.add_argument('--collision-radius', type=float, default=0.0)
+    parser.add_argument('--model-name', default=MODEL_NAME,
+                        help='nome do modelo gerado (copias com mascara usam outro nome)')
+    parser.add_argument('--output-dir', default=str(OUT_DIR),
+                        help='diretorio do modelo; padrao = variante versionada')
+    parser.add_argument('--collide-bitmask', type=int, default=None,
+                        help='<collide_bitmask> de todas as colisoes do X500 (16 bits); padrao = nao emitir')
     args = parser.parse_args()
-    generate(args.offset_z, args.mass, args.inertia, args.visual_radius, args.collision_radius)
+    if args.collide_bitmask is not None and not 0 <= args.collide_bitmask <= 0xFFFF:
+        raise SystemExit('collide-bitmask must fit in 16 bits')
+    generate(args.offset_z, args.mass, args.inertia, args.visual_radius, args.collision_radius,
+             args.model_name, args.output_dir, args.collide_bitmask)
 
 
 if __name__ == '__main__':
