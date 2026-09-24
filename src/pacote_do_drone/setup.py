@@ -20,7 +20,7 @@ setup(
         (os.path.join('share', package_name, 'worlds'), glob('worlds/*.sdf')),
         
         # Instala os parâmetros junto com a estrutura de diretórios do pacote
-        (os.path.join('share', package_name, 'parameters'), glob('parameters/*.json')),
+        (os.path.join('share', package_name, 'parameters'), glob('tether_package/parameters/*.json')),
 
         # Instala arquivos na pasta models (incluindo o cabo.sdf)
         (os.path.join('share', package_name, 'models'), glob('models/*.*')),

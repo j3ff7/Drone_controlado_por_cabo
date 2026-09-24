@@ -7,9 +7,9 @@ from pathlib import Path
 # ============================================================
 
 raiz_pacote = Path(__file__).resolve().parent
-caminho_json = raiz_pacote / 'parameters' / 'tether_parameters.json'
+caminho_json = raiz_pacote.parent / 'tether_package'/ 'parameters' / 'tether_parameters.json'
 
-pasta_models = raiz_pacote / 'models'
+pasta_models = raiz_pacote / 'models_sim'
 pasta_cabo = pasta_models / 'cabo'
 pasta_cabo.mkdir(parents=True, exist_ok=True)
 
