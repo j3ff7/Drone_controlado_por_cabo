@@ -2,7 +2,7 @@
 <sdf version='1.9'>
   <model name='x500_cabo'>
     <include merge='true'>
-      <uri>model://x500_base</uri>
+      <uri>model://x500</uri>
     </include>
 
     <include merge='true'>
