@@ -7,7 +7,7 @@ from pathlib import Path
 # ============================================================
 
 raiz_pacote = Path(__file__).resolve().parent
-caminho_json = raiz_pacote.parent / 'tether_package'/ 'parameters' / 'tether_parameters.json'
+caminho_json = raiz_pacote.parent / 'tether_package' / 'parameters' / 'tether_parameters.json'
 
 pasta_models = raiz_pacote / 'models_sim'
 pasta_cabo = pasta_models / 'cabo'
@@ -50,6 +50,61 @@ def yaw_pitch_do_segmento(p0, p1):
     return yaw, pitch
 
 
+def gerar_pontos_fixando_ponta(A, B, n, l, sag_para_cima=True, tol=1e-10):
+    A = tuple(map(float, A))
+    B = tuple(map(float, B))
+    d = dist3(A, B)
+
+    if d > n * l + 1e-9:
+        raise ValueError(
+            f"Ponto de fixação a {d:.3f} m da âncora, mas o cabo só tem {n * l:.3f} m."
+        )
+
+    if n * l - d < 1e-6:
+        return [
+            tuple(A[k] + (B[k] - A[k]) * i / n for k in range(3))
+            for i in range(n + 1)
+        ]
+
+    sinal = 4.0 if sag_para_cima else -4.0
+
+    def curva(t, s):
+        return (
+            A[0] + (B[0] - A[0]) * t,
+            A[1] + (B[1] - A[1]) * t,
+            A[2] + (B[2] - A[2]) * t + sinal * s * t * (1.0 - t),
+        )
+
+    def marchar(s):
+        pts, t = [A], 0.0
+        for _ in range(n):
+            lo, hi = t, t + 3.0
+            for _ in range(80):
+                mid = 0.5 * (lo + hi)
+                if dist3(curva(mid, s), pts[-1]) < l:
+                    lo = mid
+                else:
+                    hi = mid
+            t = 0.5 * (lo + hi)
+            pts.append(curva(t, s))
+        return pts, t
+
+    s_lo, s_hi = 0.0, n * l
+    for _ in range(200):
+        s = 0.5 * (s_lo + s_hi)
+        _, t_final = marchar(s)
+        if t_final > 1.0:
+            s_lo = s
+        else:
+            s_hi = s
+        if s_hi - s_lo < tol:
+            break
+
+    pts, _ = marchar(0.5 * (s_lo + s_hi))
+    pts[-1] = B
+    return pts
+
+
 # ============================================================
 # LER PARÂMETROS
 # ============================================================
@@ -75,12 +130,20 @@ cabo_fim_x = float(params.get("cabo_fim_x", 1.0))
 cabo_fim_y = float(params.get("cabo_fim_y", 0.0))
 cabo_fim_z = float(params.get("cabo_fim_z", 0.2))
 
+fixar_ponta = bool(params.get("fixar_ponta", False))
+fixacao_x = float(params.get("fixacao_x", 2.5))
+fixacao_y = float(params.get("fixacao_y", 0.0))
+fixacao_z = float(params.get("fixacao_z", -0.03))
+sag_para_cima = bool(params.get("sag_para_cima", True))
+
 damping_junta = float(params.get("damping_junta", 0.5))
 friction_junta = float(params.get("friction_junta", 0.1))
 limite_junta_deg = float(params.get("limite_junta_deg", 30.0))
 
 # ============================================================
-# GERAÇÃO DOS PONTOS -- CABO SEMPRE RETO/ESTICADO
+# GERAÇÃO DOS PONTOS
+#   fixar_ponta = false -> cabo reto/esticado
+#   fixar_ponta = true  -> cabo com folga, terminando em (fixacao_x/y/z)
 # ============================================================
 
 comprimento_total = num_links * length
@@ -94,26 +157,40 @@ direcao = norm3((
     P3_original[2] - P0[2]
 ))
 
-pontos_cabo = [
-    (
-        P0[0] + direcao[0] * i * length,
-        P0[1] + direcao[1] * i * length,
-        P0[2] + direcao[2] * i * length,
+if fixar_ponta:
+    P_fix = (fixacao_x, fixacao_y, fixacao_z)
+    pontos_cabo = gerar_pontos_fixando_ponta(
+        P0, P_fix, num_links, length, sag_para_cima=sag_para_cima
     )
-    for i in range(num_links + 1)
-]
+    print(f"Distância âncora -> ponto fixo: {dist3(P0, P_fix):.4f} m")
+    print(f"Folga: {comprimento_total - dist3(P0, P_fix):.4f} m")
+else:
+    pontos_cabo = [
+        (
+            P0[0] + direcao[0] * i * length,
+            P0[1] + direcao[1] * i * length,
+            P0[2] + direcao[2] * i * length,
+        )
+        for i in range(num_links + 1)
+    ]
 
 p_final = pontos_cabo[-1]
 
 comprimentos_reais = [dist3(pontos_cabo[i - 1], pontos_cabo[i]) for i in range(1, len(pontos_cabo))]
 
 print("============================================================")
-print("GERAÇÃO DO CABO (reto/esticado, sem sag)")
+if fixar_ponta:
+    print("GERAÇÃO DO CABO (ponta fixa, com sag)")
+else:
+    print("GERAÇÃO DO CABO (reto/esticado, sem sag)")
 print("============================================================")
 print(f"Número de elos: {num_links}")
 print(f"Comprimento de cada elo: {length:.6f} m")
 print(f"Comprimento total: {comprimento_total:.6f} m")
-print(f"Direção: ({direcao[0]:.4f}, {direcao[1]:.4f}, {direcao[2]:.4f})")
+if fixar_ponta:
+    print(f"Altura máx./mín. do cabo (z): {max(p[2] for p in pontos_cabo):.4f} / {min(p[2] for p in pontos_cabo):.4f} m")
+else:
+    print(f"Direção: ({direcao[0]:.4f}, {direcao[1]:.4f}, {direcao[2]:.4f})")
 print(f"Menor elo real: {min(comprimentos_reais):.6f} m")
 print(f"Maior elo real: {max(comprimentos_reais):.6f} m")
 print(f"Ponto final: ({p_final[0]:.4f}, {p_final[1]:.4f}, {p_final[2]:.4f})")
@@ -189,10 +266,10 @@ for i in range(1, num_links + 1):
     collision_length_seg = max(0.001, 0.60 * seg_len)
 
     dynamics_xml = f"""
-      <dynamics>
-        <damping>{damping_junta}</damping>
-        <friction>{friction_junta}</friction>
-      </dynamics>"""
+          <dynamics>
+            <damping>{damping_junta}</damping>
+            <friction>{friction_junta}</friction>
+          </dynamics>"""
 
     sensor_xml = ""
     if i == 1:
@@ -238,11 +315,12 @@ for i in range(1, num_links + 1):
         <pose>0 0 0 0 0 0</pose>
         <axis>
           <xyz>0 1 0</xyz>{limite_xml}
+          {dynamics_xml}
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>{limite_xml}
+          {dynamics_xml}
         </axis2>
-        {dynamics_xml}
     {sensor_xml}
       </joint>
   """
@@ -285,11 +363,12 @@ sdf += f"""
         <pose>0 0 0 0 0 0</pose>
         <axis>
           <xyz>0 1 0</xyz>{limite_xml}
+          {dynamics_xml}
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>{limite_xml}
+          {dynamics_xml}
         </axis2>
-        {dynamics_xml}
         <sensor name="sensor_tensao_ponta" type="force_torque">
           <always_on>true</always_on>
           <update_rate>50</update_rate>

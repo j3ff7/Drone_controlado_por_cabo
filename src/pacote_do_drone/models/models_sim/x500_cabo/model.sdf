@@ -14,5 +14,17 @@
       <parent>base_link</parent>
       <child>raiz_cabo</child>
     </joint>
+
+    <include>
+      <uri>model://rover_mecanum</uri>
+      <name>rover</name>
+      <pose>2.5 0 0 0 0 0</pose>
+    </include>
+
+    <joint name="ponta_rover_joint" type="fixed">
+      <parent>ponta_cabo</parent>
+      <child>rover::base_link</child>
+      <pose>0 0 0.07 0 0 0</pose>
+    </joint>
   </model>
 </sdf>

@@ -24,7 +24,7 @@
     </link>
 
       <link name="segment_1">
-        <pose>0.000000 0.000000 0.000000 0 -0.463648 0.000000</pose>
+        <pose>0.000000 0.000000 0.000000 0 -0.653225 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -43,7 +43,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.002000000000000001</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -61,6 +61,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -68,12 +73,12 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       <sensor name="sensor_tensao_ancora" type="force_torque">
         <always_on>true</always_on>
@@ -83,7 +88,7 @@
       </joint>
   
       <link name="segment_2">
-        <pose>0.044721 0.000000 0.022361 0 -0.463648 0.000000</pose>
+        <pose>0.039706 0.000000 0.030388 0 -0.636634 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -120,6 +125,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -127,17 +137,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_3">
-        <pose>0.089443 0.000000 0.044721 0 -0.463648 0.000000</pose>
+        <pose>0.079911 0.000000 0.060112 0 -0.619409 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -156,7 +166,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.0019999999999999996</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -174,6 +184,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -181,17 +196,76 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_4">
-        <pose>0.134164 0.000000 0.067082 0 -0.463648 0.000000</pose>
+        <pose>0.120623 0.000000 0.089140 0 -0.601526 0.000000</pose>
+        <enable_wind>false</enable_wind>
+        <self_collide>false</self_collide>
+
+        <visual name="visual">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
+        </collision>
+
+        <inertial>
+          <pose>0.025000 0 0 0 0 0</pose>
+          <mass>0.0019999999999999987</mass>
+          <inertia>
+            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
+          </inertia>
+        </inertial>
+      </link>
+
+      <joint name="joint_4" type="universal">
+        <parent>segment_3</parent>
+        <child>segment_4</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis2>
+    
+      </joint>
+  
+      <link name="segment_5">
+        <pose>0.161846 0.000000 0.117435 0 -0.582958 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -218,9 +292,9 @@
         </inertial>
       </link>
 
-      <joint name="joint_4" type="universal">
-        <parent>segment_3</parent>
-        <child>segment_4</child>
+      <joint name="joint_5" type="universal">
+        <parent>segment_4</parent>
+        <child>segment_5</child>
         <pose>0 0 0 0 0 0</pose>
         <axis>
           <xyz>0 1 0</xyz>
@@ -228,6 +302,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -235,17 +314,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
-      <link name="segment_5">
-        <pose>0.178885 0.000000 0.089443 0 -0.463648 0.000000</pose>
+      <link name="segment_6">
+        <pose>0.203588 0.000000 0.144960 0 -0.563683 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -272,60 +351,6 @@
         </inertial>
       </link>
 
-      <joint name="joint_5" type="universal">
-        <parent>segment_4</parent>
-        <child>segment_5</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_6">
-        <pose>0.223607 0.000000 0.111803 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
       <joint name="joint_6" type="universal">
         <parent>segment_5</parent>
         <child>segment_6</child>
@@ -336,6 +361,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -343,17 +373,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_7">
-        <pose>0.268328 0.000000 0.134164 0 -0.463648 0.000000</pose>
+        <pose>0.245853 0.000000 0.171675 0 -0.543677 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -372,7 +402,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.0019999999999999983</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -390,6 +420,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -397,17 +432,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_8">
-        <pose>0.313050 0.000000 0.156525 0 -0.463648 0.000000</pose>
+        <pose>0.288643 0.000000 0.197539 0 -0.522918 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -426,7 +461,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.002000000000000002</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -444,6 +479,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -451,17 +491,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_9">
-        <pose>0.357771 0.000000 0.178885 0 -0.463648 0.000000</pose>
+        <pose>0.331962 0.000000 0.222510 0 -0.501387 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -480,7 +520,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.0020000000000000013</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -498,6 +538,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -505,17 +550,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_10">
-        <pose>0.402492 0.000000 0.201246 0 -0.463648 0.000000</pose>
+        <pose>0.375807 0.000000 0.246542 0 -0.479065 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -534,7 +579,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002000000000000002</mass>
+          <mass>0.001999999999999998</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -552,6 +597,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -559,17 +609,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_11">
-        <pose>0.447214 0.000000 0.223607 0 -0.463648 0.000000</pose>
+        <pose>0.420179 0.000000 0.269589 0 -0.455939 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -588,7 +638,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0019999999999999974</mass>
+          <mass>0.0019999999999999983</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -606,6 +656,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -613,17 +668,607 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_12">
-        <pose>0.491935 0.000000 0.245967 0 -0.463648 0.000000</pose>
+        <pose>0.465071 0.000000 0.291605 0 -0.431999 0.000000</pose>
+        <enable_wind>false</enable_wind>
+        <self_collide>false</self_collide>
+
+        <visual name="visual">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
+        </collision>
+
+        <inertial>
+          <pose>0.025000 0 0 0 0 0</pose>
+          <mass>0.001999999999999997</mass>
+          <inertia>
+            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
+          </inertia>
+        </inertial>
+      </link>
+
+      <joint name="joint_12" type="universal">
+        <parent>segment_11</parent>
+        <child>segment_12</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis2>
+    
+      </joint>
+  
+      <link name="segment_13">
+        <pose>0.510478 0.000000 0.312539 0 -0.407240 0.000000</pose>
+        <enable_wind>false</enable_wind>
+        <self_collide>false</self_collide>
+
+        <visual name="visual">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
+        </collision>
+
+        <inertial>
+          <pose>0.025000 0 0 0 0 0</pose>
+          <mass>0.0019999999999999996</mass>
+          <inertia>
+            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
+          </inertia>
+        </inertial>
+      </link>
+
+      <joint name="joint_13" type="universal">
+        <parent>segment_12</parent>
+        <child>segment_13</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis2>
+    
+      </joint>
+  
+      <link name="segment_14">
+        <pose>0.556389 0.000000 0.332343 0 -0.381662 0.000000</pose>
+        <enable_wind>false</enable_wind>
+        <self_collide>false</self_collide>
+
+        <visual name="visual">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
+        </collision>
+
+        <inertial>
+          <pose>0.025000 0 0 0 0 0</pose>
+          <mass>0.002000000000000004</mass>
+          <inertia>
+            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
+          </inertia>
+        </inertial>
+      </link>
+
+      <joint name="joint_14" type="universal">
+        <parent>segment_13</parent>
+        <child>segment_14</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis2>
+    
+      </joint>
+  
+      <link name="segment_15">
+        <pose>0.602791 0.000000 0.350966 0 -0.355271 0.000000</pose>
+        <enable_wind>false</enable_wind>
+        <self_collide>false</self_collide>
+
+        <visual name="visual">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
+        </collision>
+
+        <inertial>
+          <pose>0.025000 0 0 0 0 0</pose>
+          <mass>0.001999999999999998</mass>
+          <inertia>
+            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
+          </inertia>
+        </inertial>
+      </link>
+
+      <joint name="joint_15" type="universal">
+        <parent>segment_14</parent>
+        <child>segment_15</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis2>
+    
+      </joint>
+  
+      <link name="segment_16">
+        <pose>0.649668 0.000000 0.368358 0 -0.328082 0.000000</pose>
+        <enable_wind>false</enable_wind>
+        <self_collide>false</self_collide>
+
+        <visual name="visual">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
+        </collision>
+
+        <inertial>
+          <pose>0.025000 0 0 0 0 0</pose>
+          <mass>0.001999999999999998</mass>
+          <inertia>
+            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
+          </inertia>
+        </inertial>
+      </link>
+
+      <joint name="joint_16" type="universal">
+        <parent>segment_15</parent>
+        <child>segment_16</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis2>
+    
+      </joint>
+  
+      <link name="segment_17">
+        <pose>0.697002 0.000000 0.384470 0 -0.300117 0.000000</pose>
+        <enable_wind>false</enable_wind>
+        <self_collide>false</self_collide>
+
+        <visual name="visual">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
+        </collision>
+
+        <inertial>
+          <pose>0.025000 0 0 0 0 0</pose>
+          <mass>0.0020000000000000018</mass>
+          <inertia>
+            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
+          </inertia>
+        </inertial>
+      </link>
+
+      <joint name="joint_17" type="universal">
+        <parent>segment_16</parent>
+        <child>segment_17</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis2>
+    
+      </joint>
+  
+      <link name="segment_18">
+        <pose>0.744767 0.000000 0.399251 0 -0.271408 0.000000</pose>
+        <enable_wind>false</enable_wind>
+        <self_collide>false</self_collide>
+
+        <visual name="visual">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
+        </collision>
+
+        <inertial>
+          <pose>0.025000 0 0 0 0 0</pose>
+          <mass>0.0019999999999999966</mass>
+          <inertia>
+            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
+          </inertia>
+        </inertial>
+      </link>
+
+      <joint name="joint_18" type="universal">
+        <parent>segment_17</parent>
+        <child>segment_18</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis2>
+    
+      </joint>
+  
+      <link name="segment_19">
+        <pose>0.792936 0.000000 0.412656 0 -0.241994 0.000000</pose>
+        <enable_wind>false</enable_wind>
+        <self_collide>false</self_collide>
+
+        <visual name="visual">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
+        </collision>
+
+        <inertial>
+          <pose>0.025000 0 0 0 0 0</pose>
+          <mass>0.0020000000000000035</mass>
+          <inertia>
+            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
+          </inertia>
+        </inertial>
+      </link>
+
+      <joint name="joint_19" type="universal">
+        <parent>segment_18</parent>
+        <child>segment_19</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis2>
+    
+      </joint>
+  
+      <link name="segment_20">
+        <pose>0.841480 0.000000 0.424638 0 -0.211925 0.000000</pose>
+        <enable_wind>false</enable_wind>
+        <self_collide>false</self_collide>
+
+        <visual name="visual">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
+        </collision>
+
+        <inertial>
+          <pose>0.025000 0 0 0 0 0</pose>
+          <mass>0.0019999999999999996</mass>
+          <inertia>
+            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
+          </inertia>
+        </inertial>
+      </link>
+
+      <joint name="joint_20" type="universal">
+        <parent>segment_19</parent>
+        <child>segment_20</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis2>
+    
+      </joint>
+  
+      <link name="segment_21">
+        <pose>0.890361 0.000000 0.435155 0 -0.181262 0.000000</pose>
+        <enable_wind>false</enable_wind>
+        <self_collide>false</self_collide>
+
+        <visual name="visual">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <pose>0.025000 0 0 0 1.5708 0</pose>
+          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
+        </collision>
+
+        <inertial>
+          <pose>0.025000 0 0 0 0 0</pose>
+          <mass>0.0020000000000000013</mass>
+          <inertia>
+            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
+          </inertia>
+        </inertial>
+      </link>
+
+      <joint name="joint_21" type="universal">
+        <parent>segment_20</parent>
+        <child>segment_21</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.523599</lower>
+          <upper>0.523599</upper>
+        </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
+        </axis2>
+    
+      </joint>
+  
+      <link name="segment_22">
+        <pose>0.939542 0.000000 0.444168 0 -0.150074 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -650,546 +1295,6 @@
         </inertial>
       </link>
 
-      <joint name="joint_12" type="universal">
-        <parent>segment_11</parent>
-        <child>segment_12</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_13">
-        <pose>0.536656 0.000000 0.268328 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_13" type="universal">
-        <parent>segment_12</parent>
-        <child>segment_13</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_14">
-        <pose>0.581378 0.000000 0.290689 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_14" type="universal">
-        <parent>segment_13</parent>
-        <child>segment_14</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_15">
-        <pose>0.626099 0.000000 0.313050 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_15" type="universal">
-        <parent>segment_14</parent>
-        <child>segment_15</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_16">
-        <pose>0.670820 0.000000 0.335410 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_16" type="universal">
-        <parent>segment_15</parent>
-        <child>segment_16</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_17">
-        <pose>0.715542 0.000000 0.357771 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000044</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_17" type="universal">
-        <parent>segment_16</parent>
-        <child>segment_17</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_18">
-        <pose>0.760263 0.000000 0.380132 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.001999999999999995</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_18" type="universal">
-        <parent>segment_17</parent>
-        <child>segment_18</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_19">
-        <pose>0.804984 0.000000 0.402492 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000044</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_19" type="universal">
-        <parent>segment_18</parent>
-        <child>segment_19</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_20">
-        <pose>0.849706 0.000000 0.424853 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_20" type="universal">
-        <parent>segment_19</parent>
-        <child>segment_20</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_21">
-        <pose>0.894427 0.000000 0.447214 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.001999999999999995</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_21" type="universal">
-        <parent>segment_20</parent>
-        <child>segment_21</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_22">
-        <pose>0.939149 0.000000 0.469574 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
       <joint name="joint_22" type="universal">
         <parent>segment_21</parent>
         <child>segment_22</child>
@@ -1200,6 +1305,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1207,17 +1317,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_23">
-        <pose>0.983870 0.000000 0.491935 0 -0.463648 0.000000</pose>
+        <pose>0.988980 0.000000 0.451644 0 -0.118438 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1236,7 +1346,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000044</mass>
+          <mass>0.0020000000000000018</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1254,6 +1364,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1261,17 +1376,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_24">
-        <pose>1.028591 0.000000 0.514296 0 -0.463648 0.000000</pose>
+        <pose>1.038629 0.000000 0.457552 0 -0.086441 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1290,7 +1405,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.002000000000000006</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1308,6 +1423,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1315,17 +1435,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_25">
-        <pose>1.073313 0.000000 0.536656 0 -0.463648 0.000000</pose>
+        <pose>1.088443 0.000000 0.461869 0 -0.054177 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1344,7 +1464,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.002000000000000007</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1362,6 +1482,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1369,17 +1494,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_26">
-        <pose>1.118034 0.000000 0.559017 0 -0.463648 0.000000</pose>
+        <pose>1.138369 0.000000 0.464576 0 -0.021742 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1398,7 +1523,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.0019999999999999966</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1416,6 +1541,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1423,17 +1553,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_27">
-        <pose>1.162755 0.000000 0.581378 0 -0.463648 0.000000</pose>
+        <pose>1.188358 0.000000 0.465663 0 0.010762 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1452,7 +1582,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.0019999999999999875</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1470,6 +1600,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1477,17 +1612,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_28">
-        <pose>1.207477 0.000000 0.603738 0 -0.463648 0.000000</pose>
+        <pose>1.238355 0.000000 0.465125 0 0.043231 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1506,7 +1641,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.0020000000000000044</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1524,6 +1659,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1531,17 +1671,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_29">
-        <pose>1.252198 0.000000 0.626099 0 -0.463648 0.000000</pose>
+        <pose>1.288308 0.000000 0.462964 0 0.075565 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1560,7 +1700,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.002000000000000008</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1578,6 +1718,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1585,17 +1730,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_30">
-        <pose>1.296919 0.000000 0.648460 0 -0.463648 0.000000</pose>
+        <pose>1.338165 0.000000 0.459189 0 0.107663 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1614,7 +1759,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.0020000000000000057</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1632,6 +1777,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1639,17 +1789,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_31">
-        <pose>1.341641 0.000000 0.670820 0 -0.463648 0.000000</pose>
+        <pose>1.387876 0.000000 0.453817 0 0.139430 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1668,7 +1818,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.001999999999999997</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1686,6 +1836,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1693,17 +1848,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_32">
-        <pose>1.386362 0.000000 0.693181 0 -0.463648 0.000000</pose>
+        <pose>1.437391 0.000000 0.446868 0 0.170779 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1722,7 +1877,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.0020000000000000052</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1740,6 +1895,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1747,17 +1907,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_33">
-        <pose>1.431084 0.000000 0.715542 0 -0.463648 0.000000</pose>
+        <pose>1.486663 0.000000 0.438370 0 0.201628 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1776,7 +1936,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.002000000000000002</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1794,6 +1954,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1801,17 +1966,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_34">
-        <pose>1.475805 0.000000 0.737902 0 -0.463648 0.000000</pose>
+        <pose>1.535650 0.000000 0.428357 0 0.231904 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1830,7 +1995,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
+          <mass>0.0019999999999999966</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1848,6 +2013,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1855,17 +2025,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_35">
-        <pose>1.520526 0.000000 0.760263 0 -0.463648 0.000000</pose>
+        <pose>1.584312 0.000000 0.416866 0 0.261546 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1884,7 +2054,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
+          <mass>0.002000000000000004</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1902,6 +2072,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1909,17 +2084,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_36">
-        <pose>1.565248 0.000000 0.782624 0 -0.463648 0.000000</pose>
+        <pose>1.632611 0.000000 0.403937 0 0.290498 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1938,7 +2113,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.002000000000000001</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1956,6 +2131,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -1963,17 +2143,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_37">
-        <pose>1.609969 0.000000 0.804984 0 -0.463648 0.000000</pose>
+        <pose>1.680516 0.000000 0.389615 0 0.318719 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1992,7 +2172,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.0020000000000000013</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2010,6 +2190,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2017,17 +2202,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_38">
-        <pose>1.654690 0.000000 0.827345 0 -0.463648 0.000000</pose>
+        <pose>1.727998 0.000000 0.373948 0 0.346173 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2046,7 +2231,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
+          <mass>0.0020000000000000044</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2064,6 +2249,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2071,17 +2261,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_39">
-        <pose>1.699412 0.000000 0.849706 0 -0.463648 0.000000</pose>
+        <pose>1.775032 0.000000 0.356983 0 0.372835 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2100,7 +2290,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
+          <mass>0.0019999999999999857</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2118,6 +2308,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2125,17 +2320,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_40">
-        <pose>1.744133 0.000000 0.872067 0 -0.463648 0.000000</pose>
+        <pose>1.821597 0.000000 0.338770 0 0.398689 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2154,7 +2349,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
+          <mass>0.0020000000000000013</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2172,6 +2367,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2179,17 +2379,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_41">
-        <pose>1.788854 0.000000 0.894427 0 -0.463648 0.000000</pose>
+        <pose>1.867676 0.000000 0.319359 0 0.423725 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2208,7 +2408,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
+          <mass>0.002000000000000007</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2226,6 +2426,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2233,17 +2438,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_42">
-        <pose>1.833576 0.000000 0.916788 0 -0.463648 0.000000</pose>
+        <pose>1.913254 0.000000 0.298801 0 0.447942 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2262,7 +2467,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.002</mass>
+          <mass>0.0020000000000000013</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2280,6 +2485,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2287,17 +2497,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_43">
-        <pose>1.878297 0.000000 0.939149 0 -0.463648 0.000000</pose>
+        <pose>1.958321 0.000000 0.277146 0 0.471342 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2316,7 +2526,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
+          <mass>0.0019999999999999927</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2334,6 +2544,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2341,17 +2556,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_44">
-        <pose>1.923018 0.000000 0.961509 0 -0.463648 0.000000</pose>
+        <pose>2.002869 0.000000 0.254442 0 0.493934 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2370,7 +2585,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
+          <mass>0.0019999999999999844</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2388,6 +2603,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2395,17 +2615,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_45">
-        <pose>1.967740 0.000000 0.983870 0 -0.463648 0.000000</pose>
+        <pose>2.046893 0.000000 0.230737 0 0.515730 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2424,7 +2644,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000196</mass>
+          <mass>0.0020000000000000005</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2442,6 +2662,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2449,17 +2674,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_46">
-        <pose>2.012461 0.000000 1.006231 0 -0.463648 0.000000</pose>
+        <pose>2.090389 0.000000 0.206079 0 0.536748 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2478,7 +2703,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
+          <mass>0.0019999999999999987</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2496,6 +2721,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2503,17 +2733,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_47">
-        <pose>2.057183 0.000000 1.028591 0 -0.463648 0.000000</pose>
+        <pose>2.133358 0.000000 0.180511 0 0.557006 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2532,7 +2762,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
+          <mass>0.002000000000000003</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2550,6 +2780,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2557,17 +2792,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_48">
-        <pose>2.101904 0.000000 1.050952 0 -0.463648 0.000000</pose>
+        <pose>2.175800 0.000000 0.154079 0 0.576526 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2586,7 +2821,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
+          <mass>0.0020000000000000113</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2604,6 +2839,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2611,17 +2851,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_49">
-        <pose>2.146625 0.000000 1.073313 0 -0.463648 0.000000</pose>
+        <pose>2.217718 0.000000 0.126823 0 0.595330 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2640,7 +2880,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
+          <mass>0.0019999999999999883</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2658,6 +2898,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2665,17 +2910,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="segment_50">
-        <pose>2.191347 0.000000 1.095673 0 -0.463648 0.000000</pose>
+        <pose>2.259116 0.000000 0.098784 0 0.613442 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -2694,7 +2939,7 @@
 
         <inertial>
           <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
+          <mass>0.0020000000003875624</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -2712,6 +2957,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -2719,1097 +2969,17 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_51">
-        <pose>2.236068 0.000000 1.118034 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_51" type="universal">
-        <parent>segment_50</parent>
-        <child>segment_51</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_52">
-        <pose>2.280789 0.000000 1.140395 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_52" type="universal">
-        <parent>segment_51</parent>
-        <child>segment_52</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_53">
-        <pose>2.325511 0.000000 1.162755 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_53" type="universal">
-        <parent>segment_52</parent>
-        <child>segment_53</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_54">
-        <pose>2.370232 0.000000 1.185116 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_54" type="universal">
-        <parent>segment_53</parent>
-        <child>segment_54</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_55">
-        <pose>2.414953 0.000000 1.207477 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_55" type="universal">
-        <parent>segment_54</parent>
-        <child>segment_55</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_56">
-        <pose>2.459675 0.000000 1.229837 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_56" type="universal">
-        <parent>segment_55</parent>
-        <child>segment_56</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_57">
-        <pose>2.504396 0.000000 1.252198 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_57" type="universal">
-        <parent>segment_56</parent>
-        <child>segment_57</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_58">
-        <pose>2.549117 0.000000 1.274559 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_58" type="universal">
-        <parent>segment_57</parent>
-        <child>segment_58</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_59">
-        <pose>2.593839 0.000000 1.296919 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_59" type="universal">
-        <parent>segment_58</parent>
-        <child>segment_59</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_60">
-        <pose>2.638560 0.000000 1.319280 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_60" type="universal">
-        <parent>segment_59</parent>
-        <child>segment_60</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_61">
-        <pose>2.683282 0.000000 1.341641 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_61" type="universal">
-        <parent>segment_60</parent>
-        <child>segment_61</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_62">
-        <pose>2.728003 0.000000 1.364001 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_62" type="universal">
-        <parent>segment_61</parent>
-        <child>segment_62</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_63">
-        <pose>2.772724 0.000000 1.386362 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_63" type="universal">
-        <parent>segment_62</parent>
-        <child>segment_63</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_64">
-        <pose>2.817446 0.000000 1.408723 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_64" type="universal">
-        <parent>segment_63</parent>
-        <child>segment_64</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_65">
-        <pose>2.862167 0.000000 1.431084 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_65" type="universal">
-        <parent>segment_64</parent>
-        <child>segment_65</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_66">
-        <pose>2.906888 0.000000 1.453444 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_66" type="universal">
-        <parent>segment_65</parent>
-        <child>segment_66</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_67">
-        <pose>2.951610 0.000000 1.475805 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_67" type="universal">
-        <parent>segment_66</parent>
-        <child>segment_67</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_68">
-        <pose>2.996331 0.000000 1.498166 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.0020000000000000096</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_68" type="universal">
-        <parent>segment_67</parent>
-        <child>segment_68</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_69">
-        <pose>3.041052 0.000000 1.520526 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_69" type="universal">
-        <parent>segment_68</parent>
-        <child>segment_69</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
-    
-      </joint>
-  
-      <link name="segment_70">
-        <pose>3.085774 0.000000 1.542887 0 -0.463648 0.000000</pose>
-        <enable_wind>false</enable_wind>
-        <self_collide>false</self_collide>
-
-        <visual name="visual">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.003</radius><length>0.050000</length></cylinder></geometry>
-          <material>
-            <ambient>0 0 0 1</ambient>
-            <diffuse>0 0 0 1</diffuse>
-          </material>
-        </visual>
-        <collision name="collision">
-          <pose>0.025000 0 0 0 1.5708 0</pose>
-          <geometry><cylinder><radius>0.0015</radius><length>0.030000</length></cylinder></geometry>
-        </collision>
-
-        <inertial>
-          <pose>0.025000 0 0 0 0 0</pose>
-          <mass>0.00199999999999999</mass>
-          <inertia>
-            <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
-            <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
-          </inertia>
-        </inertial>
-      </link>
-
-      <joint name="joint_70" type="universal">
-        <parent>segment_69</parent>
-        <child>segment_70</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
     
       </joint>
   
       <link name="ponta_cabo">
-        <pose>3.130495 0.000000 1.565248 0 0 0</pose>
+        <pose>2.300000 0.000000 0.070000 0 0 0</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -3834,7 +3004,7 @@
       </link>
 
       <joint name="joint_ponta" type="universal">
-        <parent>segment_70</parent>
+        <parent>segment_50</parent>
         <child>ponta_cabo</child>
         <pose>0 0 0 0 0 0</pose>
         <axis>
@@ -3843,6 +3013,11 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis>
         <axis2>
           <xyz>0 0 1</xyz>
@@ -3850,12 +3025,12 @@
           <lower>-0.523599</lower>
           <upper>0.523599</upper>
         </limit>
+          
+          <dynamics>
+            <damping>0.002</damping>
+            <friction>0.0</friction>
+          </dynamics>
         </axis2>
-        
-      <dynamics>
-        <damping>0.5</damping>
-        <friction>0.1</friction>
-      </dynamics>
         <sensor name="sensor_tensao_ponta" type="force_torque">
           <always_on>true</always_on>
           <update_rate>50</update_rate>
