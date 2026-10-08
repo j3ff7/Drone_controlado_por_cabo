@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="tether_static_n30">
+  <compiler angle="radian" coordinate="local" />
+  <option timestep="0.001" gravity="0 0 -9.80665" integrator="RK4" density="1.2" viscosity="0" />
+  <default>
+    <geom contype="1" conaffinity="1" condim="3" friction="1.0 0.05 0.05" />
+    <site type="sphere" size="0.008" rgba="1 0 0 1" />
+  </default>
+  <visual>
+    <headlight ambient="0.4 0.4 0.4" />
+    <global offwidth="1280" offheight="720" />
+  </visual>
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" rgb1="0.25 0.28 0.30" rgb2="0.32 0.35 0.38" width="512" height="512" />
+    <material name="grid" texture="grid" texrepeat="12 12" reflectance="0.05" />
+  </asset>
+  <worldbody>
+    <light pos="0 0 6" dir="0 0 -1" diffuse="0.8 0.8 0.8" />
+    <geom name="floor" type="plane" size="60 60 0.1" material="grid" pos="0 0 0" />
+    <site name="east_marker" pos="3 0 0.02" size="0.05" rgba="1 0.2 0.2 1" />
+    <site name="north_marker" pos="0 3 0.02" size="0.05" rgba="0.2 1 0.2 1" />
+    <body name="tether_link_1" pos="0 0 0.01">
+      <joint name="tether_joint_1" type="ball" damping="0.002" armature="1e-6" />
+      <geom name="tether_geom_1" type="capsule" fromto="0 0 0 0.083333333333333329 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+      <body name="tether_link_2" pos="0.083333333333333329 0 0">
+        <joint name="tether_joint_2" type="ball" damping="0.002" armature="1e-6" />
+        <geom name="tether_geom_2" type="capsule" fromto="0 0 0 0.083333333333333329 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+        <body name="tether_link_3" pos="0.083333333333333329 0 0">
+          <joint name="tether_joint_3" type="ball" damping="0.002" armature="1e-6" />
+          <geom name="tether_geom_3" type="capsule" fromto="0 0 0 0.083333333333333343 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+          <body name="tether_link_4" pos="0.083333333333333343 0 0">
+            <joint name="tether_joint_4" type="ball" damping="0.002" armature="1e-6" />
+            <geom name="tether_geom_4" type="capsule" fromto="0 0 0 0.083333333333333315 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+            <body name="tether_link_5" pos="0.083333333333333315 0 0">
+              <joint name="tether_joint_5" type="ball" damping="0.002" armature="1e-6" />
+              <geom name="tether_geom_5" type="capsule" fromto="0 0 0 0.083333333333333315 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+              <body name="tether_link_6" pos="0.083333333333333315 0 0">
+                <joint name="tether_joint_6" type="ball" damping="0.002" armature="1e-6" />
+                <geom name="tether_geom_6" type="capsule" fromto="0 0 0 0.08333333333333337 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                <body name="tether_link_7" pos="0.08333333333333337 0 0">
+                  <joint name="tether_joint_7" type="ball" damping="0.002" armature="1e-6" />
+                  <geom name="tether_geom_7" type="capsule" fromto="0 0 0 0.083333333333333259 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                  <body name="tether_link_8" pos="0.083333333333333259 0 0">
+                    <joint name="tether_joint_8" type="ball" damping="0.002" armature="1e-6" />
+                    <geom name="tether_geom_8" type="capsule" fromto="0 0 0 0.08333333333333337 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                    <body name="tether_link_9" pos="0.08333333333333337 0 0">
+                      <joint name="tether_joint_9" type="ball" damping="0.002" armature="1e-6" />
+                      <geom name="tether_geom_9" type="capsule" fromto="0 0 0 0.08333333333333337 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                      <body name="tether_link_10" pos="0.08333333333333337 0 0">
+                        <joint name="tether_joint_10" type="ball" damping="0.002" armature="1e-6" />
+                        <geom name="tether_geom_10" type="capsule" fromto="0 0 0 0.083333333333333259 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                        <body name="tether_link_11" pos="0.083333333333333259 0 0">
+                          <joint name="tether_joint_11" type="ball" damping="0.002" armature="1e-6" />
+                          <geom name="tether_geom_11" type="capsule" fromto="0 0 0 0.08333333333333337 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                          <body name="tether_link_12" pos="0.08333333333333337 0 0">
+                            <joint name="tether_joint_12" type="ball" damping="0.002" armature="1e-6" />
+                            <geom name="tether_geom_12" type="capsule" fromto="0 0 0 0.08333333333333337 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                            <body name="tether_link_13" pos="0.08333333333333337 0 0">
+                              <joint name="tether_joint_13" type="ball" damping="0.002" armature="1e-6" />
+                              <geom name="tether_geom_13" type="capsule" fromto="0 0 0 0.083333333333333259 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                              <body name="tether_link_14" pos="0.083333333333333259 0 0">
+                                <joint name="tether_joint_14" type="ball" damping="0.002" armature="1e-6" />
+                                <geom name="tether_geom_14" type="capsule" fromto="0 0 0 0.083333333333333259 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                <body name="tether_link_15" pos="0.083333333333333259 0 0">
+                                  <joint name="tether_joint_15" type="ball" damping="0.002" armature="1e-6" />
+                                  <geom name="tether_geom_15" type="capsule" fromto="0 0 0 0.083333333333333481 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                  <body name="tether_link_16" pos="0.083333333333333481 0 0">
+                                    <joint name="tether_joint_16" type="ball" damping="0.002" armature="1e-6" />
+                                    <geom name="tether_geom_16" type="capsule" fromto="0 0 0 0.083333333333333259 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                    <body name="tether_link_17" pos="0.083333333333333259 0 0">
+                                      <joint name="tether_joint_17" type="ball" damping="0.002" armature="1e-6" />
+                                      <geom name="tether_geom_17" type="capsule" fromto="0 0 0 0.083333333333333259 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                      <body name="tether_link_18" pos="0.083333333333333259 0 0">
+                                        <joint name="tether_joint_18" type="ball" damping="0.002" armature="1e-6" />
+                                        <geom name="tether_geom_18" type="capsule" fromto="0 0 0 0.083333333333333481 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                        <body name="tether_link_19" pos="0.083333333333333481 0 0">
+                                          <joint name="tether_joint_19" type="ball" damping="0.002" armature="1e-6" />
+                                          <geom name="tether_geom_19" type="capsule" fromto="0 0 0 0.083333333333333259 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                          <body name="tether_link_20" pos="0.083333333333333259 0 0">
+                                            <joint name="tether_joint_20" type="ball" damping="0.002" armature="1e-6" />
+                                            <geom name="tether_geom_20" type="capsule" fromto="0 0 0 0.083333333333333259 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                            <body name="tether_link_21" pos="0.083333333333333259 0 0">
+                                              <joint name="tether_joint_21" type="ball" damping="0.002" armature="1e-6" />
+                                              <geom name="tether_geom_21" type="capsule" fromto="0 0 0 0.083333333333333481 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                              <body name="tether_link_22" pos="0.083333333333333481 0 0">
+                                                <joint name="tether_joint_22" type="ball" damping="0.002" armature="1e-6" />
+                                                <geom name="tether_geom_22" type="capsule" fromto="0 0 0 0.083333333333333259 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                                <body name="tether_link_23" pos="0.083333333333333259 0 0">
+                                                  <joint name="tether_joint_23" type="ball" damping="0.002" armature="1e-6" />
+                                                  <geom name="tether_geom_23" type="capsule" fromto="0 0 0 0.083333333333333259 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                                  <body name="tether_link_24" pos="0.083333333333333259 0 0">
+                                                    <joint name="tether_joint_24" type="ball" damping="0.002" armature="1e-6" />
+                                                    <geom name="tether_geom_24" type="capsule" fromto="0 0 0 0.083333333333333481 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                                    <body name="tether_link_25" pos="0.083333333333333481 0 0">
+                                                      <joint name="tether_joint_25" type="ball" damping="0.002" armature="1e-6" />
+                                                      <geom name="tether_geom_25" type="capsule" fromto="0 0 0 0.083333333333333037 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                                      <body name="tether_link_26" pos="0.083333333333333037 0 0">
+                                                        <joint name="tether_joint_26" type="ball" damping="0.002" armature="1e-6" />
+                                                        <geom name="tether_geom_26" type="capsule" fromto="0 0 0 0.083333333333333481 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                                        <body name="tether_link_27" pos="0.083333333333333481 0 0">
+                                                          <joint name="tether_joint_27" type="ball" damping="0.002" armature="1e-6" />
+                                                          <geom name="tether_geom_27" type="capsule" fromto="0 0 0 0.083333333333333481 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                                          <body name="tether_link_28" pos="0.083333333333333481 0 0">
+                                                            <joint name="tether_joint_28" type="ball" damping="0.002" armature="1e-6" />
+                                                            <geom name="tether_geom_28" type="capsule" fromto="0 0 0 0.083333333333333037 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                                            <body name="tether_link_29" pos="0.083333333333333037 0 0">
+                                                              <joint name="tether_joint_29" type="ball" damping="0.002" armature="1e-6" />
+                                                              <geom name="tether_geom_29" type="capsule" fromto="0 0 0 0.083333333333333481 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                                              <body name="tether_link_30" pos="0.083333333333333481 0 0">
+                                                                <joint name="tether_joint_30" type="ball" damping="0.002" armature="1e-6" />
+                                                                <geom name="tether_geom_30" type="capsule" fromto="0 0 0 0.083333333333333481 0 0" size="0.0030000000000000001" mass="0.0050000000000000001" contype="2" conaffinity="1" rgba="0.04 0.04 0.04 1" />
+                                                                <site name="tether_endpoint" pos="0.083333333333333481 0 0" size="0.012" rgba="0 0.3 1 1" />
+                                                              </body>
+                                                            </body>
+                                                          </body>
+                                                        </body>
+                                                      </body>
+                                                    </body>
+                                                  </body>
+                                                </body>
+                                              </body>
+                                            </body>
+                                          </body>
+                                        </body>
+                                      </body>
+                                    </body>
+                                  </body>
+                                </body>
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    <site name="tether_anchor" pos="0 0 0.01" size="0.015" rgba="1 0.1 0.1 1" />
+  </worldbody>
+</mujoco>

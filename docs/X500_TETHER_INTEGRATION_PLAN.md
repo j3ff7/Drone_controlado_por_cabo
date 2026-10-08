@@ -1832,3 +1832,14 @@ Validar ancora fixa antes de modelar carretel.
 
 Justificativa:
 essa estrategia minimiza risco, mantem reprodutibilidade com PX4 v1.14.4, preserva a comparacao com o X500 original e evita misturar problemas de controle, junta, cabo, sensor e carretel em uma unica etapa.
+
+## 11. Decisao posterior: MuJoCo de referencia e cabo nodal no Gazebo
+
+Decisao consolidada em 2026-10-06: usar o MuJoCo `N=70` como referencia fisica
+offline e manter Gazebo/PX4 como plataforma operacional. Os testes posteriores
+mostraram que aumentar a cadeia articulada nao e uma rota de producao: `N=20`
+passa em estatico, mas aborta em voo, enquanto cadeias maiores encontram limites
+de construcao/transformadas do DART. O proximo desenvolvimento e um cabo nodal em
+plugin proprio, sem joints estruturais entre os nos.
+
+Plano, metricas e gates atuais: `docs/SIMULATION_STRATEGY.md`.

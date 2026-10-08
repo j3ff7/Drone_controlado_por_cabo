@@ -9,6 +9,26 @@ Este branch (`shared`) consolida uma baseline para simular no Gazebo/Ignition um
 
 O fluxo principal usa os pacotes em `src/`. Os diretorios `Gazebo/`, `Chrono/`, `Coppelia/` e `models/` contem material legado ou experimental.
 
+## Estrategia de Simulacao
+
+O desenvolvimento segue duas trilhas complementares:
+
+- **Gazebo/PX4:** backend operacional para controle, ROS 2, sensores e integracao;
+- **MuJoCo:** referencia fisica offline para forma, tensao, tangente e contato do cabo.
+
+A decisao, os limites medidos e os proximos gates estao em
+[`docs/SIMULATION_STRATEGY.md`](docs/SIMULATION_STRATEGY.md).
+
+## Backend de Referencia MuJoCo
+
+Um proof of concept isolado de PX4 SITL + MuJoCo esta em
+[`experiments/mujoco_px4/`](experiments/mujoco_px4/README.md). Ele preserva a
+baseline Gazebo, usa um ambiente Python e rootfs PX4 privados e inclui testes
+M0-M4 com X500, tether ancorado N=30/70/100, voo vertical e deslocamento
+horizontal. Nenhuma modificacao no checkout local do PX4 e necessaria. O backend
+nao substitui o Gazebo/PX4; ele fornece os dados usados para calibrar e validar o
+modelo operacional reduzido.
+
 ## Build
 
 ```bash

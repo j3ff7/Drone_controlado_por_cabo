@@ -1,0 +1,6 @@
+omega_idle: 0.0
+rotors:
+  - {pos: [0.174, -0.174, 0.06], spin: CCW, c_t: 8.54858e-06, km: 0.016, omega_max: 1000.0, label: front_right}
+  - {pos: [-0.174, 0.174, 0.06], spin: CCW, c_t: 8.54858e-06, km: 0.016, omega_max: 1000.0, label: rear_left}
+  - {pos: [0.174, 0.174, 0.06], spin: CW, c_t: 8.54858e-06, km: 0.016, omega_max: 1000.0, label: front_left}
+  - {pos: [-0.174, -0.174, 0.06], spin: CW, c_t: 8.54858e-06, km: 0.016, omega_max: 1000.0, label: rear_right}

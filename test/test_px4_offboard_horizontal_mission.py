@@ -1,5 +1,6 @@
 import importlib.util
 from pathlib import Path
+from types import SimpleNamespace
 
 from pymavlink import mavutil
 
@@ -36,3 +37,20 @@ def test_position_setpoint_mask_keeps_position_and_yaw_active():
 def test_norm_helpers():
     assert mission.norm2(3.0, 4.0) == 5.0
     assert mission.norm3(2.0, 3.0, 6.0) == 7.0
+
+
+def test_sim_time_comes_from_px4_boot_clock():
+    instance = mission.OffboardMission.__new__(mission.OffboardMission)
+    instance.local_position = SimpleNamespace(time_boot_ms=12345)
+    assert instance.sim_time() == 12.345
+
+
+def test_phase_clock_selects_simulated_time(monkeypatch):
+    instance = mission.OffboardMission.__new__(mission.OffboardMission)
+    instance.args = SimpleNamespace(phase_clock='sim')
+    instance.local_position = SimpleNamespace(time_boot_ms=2500)
+    assert instance.phase_time() == 2.5
+
+    instance.args.phase_clock = 'wall'
+    monkeypatch.setattr(mission.time, 'monotonic', lambda: 42.0)
+    assert instance.phase_time() == 42.0

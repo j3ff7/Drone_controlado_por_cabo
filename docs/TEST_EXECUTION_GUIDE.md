@@ -1223,12 +1223,23 @@ Voo vertical curto: suba PX4 como no teste vertical de B1, insira o cabo, espere
 com `./tools/record_tether_timeseries.py --duration 75 --output-dir <dir> --prefix vertical`
 gravando em paralelo.
 
-**Atencao — a ferramenta de missao nao detecta a morte do simulador.** Se o `gz sim` abortar
-durante o voo, ela reporta `failed = false` e o UAV aparece congelado no ar. Confira sempre:
+**Correcao posterior:** a ferramenta de missao usa o relogio simulado do PX4 por padrao e
+reprova se ele ficar congelado. O gravador tambem aceita `--sim-duration`; use essa opcao em
+novas campanhas para que RTF baixo nao encurte o ensaio. `--phase-clock wall` e `--duration`
+permanecem apenas para reproduzir campanhas historicas. Confira sempre:
 
 ```bash
 python3 -c "import json; m=json.load(open('<dir>/vertical_record_manifest.json')); print(m['sim_time_span_s'], 'de', m['duration_s'])"
 grep -c "Assertion" <dir>/px4.log      # tem que ser 0
+```
+
+Exemplo para uma nova corrida:
+
+```bash
+./tools/record_tether_timeseries.py --sim-duration 75 --wall-timeout 1800 \
+  --output-dir <dir> --prefix vertical
+./tools/px4_offboard_horizontal_mission.py --phase-clock sim \
+  --output-dir <dir> --dx 0.0 --altitude 0.5 --relative-altitude --rate 20
 ```
 
 Resultado da restauracao: `N = 20` com colisoes aborta nas 3 corridas, com 7 a 14 s simulados

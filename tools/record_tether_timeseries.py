@@ -190,7 +190,13 @@ class TopicRecorder(threading.Thread):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--duration', type=float, required=True)
+    duration = parser.add_mutually_exclusive_group(required=True)
+    duration.add_argument('--duration', type=float,
+                          help='duracao em tempo de parede [s] (compatibilidade)')
+    duration.add_argument('--sim-duration', type=float,
+                          help='duracao em tempo simulado do Gazebo [s]')
+    parser.add_argument('--wall-timeout', type=float, default=1800.0,
+                        help='teto de parede ao usar --sim-duration')
     parser.add_argument('--output-dir', required=True)
     parser.add_argument('--prefix', default='tether')
     args = parser.parse_args()
@@ -223,7 +229,23 @@ def main():
     for recorder in recorders.values():
         recorder.start()
 
-    time.sleep(args.duration)
+    wall_start = time.monotonic()
+    timed_out = False
+    if args.duration is not None:
+        time.sleep(args.duration)
+    else:
+        sim_start = None
+        while True:
+            samples = recorders['world'].samples
+            if samples:
+                current_sim = samples[-1][1][0]
+                sim_start = current_sim if sim_start is None else sim_start
+                if current_sim - sim_start >= args.sim_duration:
+                    break
+            if time.monotonic() - wall_start >= args.wall_timeout:
+                timed_out = True
+                break
+            time.sleep(0.1)
     stop_event.set()
     for recorder in recorders.values():
         recorder.terminate()
@@ -239,7 +261,14 @@ def main():
     ]
     to_sim = build_sim_clock(world_rows)
 
-    manifest = {'duration_s': args.duration, 'topics': {}}
+    manifest = {
+        'duration_s': args.duration,
+        'sim_duration_requested_s': args.sim_duration,
+        'wall_elapsed_s': time.monotonic() - wall_start,
+        'wall_timeout_s': args.wall_timeout if args.sim_duration is not None else None,
+        'timed_out': timed_out,
+        'topics': {},
+    }
 
     world_path = out_dir / f'{args.prefix}_world_stats.csv'
     with world_path.open('w', newline='') as handle:
@@ -274,6 +303,8 @@ def main():
     manifest_path = out_dir / f'{args.prefix}_record_manifest.json'
     manifest_path.write_text(json.dumps(manifest, indent=2))
     print(json.dumps(manifest, indent=2))
+    if timed_out:
+        raise SystemExit(1)
 
 
 if __name__ == '__main__':

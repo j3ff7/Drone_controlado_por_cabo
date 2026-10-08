@@ -131,8 +131,11 @@ class OffboardMission:
         )
 
     def send_setpoint(self, x, y, z, yaw):
+        timestamp_ms = int((time.monotonic() - self.start_wall) * 1000)
+        if self.local_position is not None and hasattr(self.local_position, 'time_boot_ms'):
+            timestamp_ms = int(self.local_position.time_boot_ms)
         self.master.mav.set_position_target_local_ned_send(
-            int((time.monotonic() - self.start_wall) * 1000),
+            timestamp_ms,
             self.target_system,
             self.target_component,
             mavutil.mavlink.MAV_FRAME_LOCAL_NED,
@@ -157,6 +160,7 @@ class OffboardMission:
         row = {
             't_epoch': time.time(),
             't_wall': time.monotonic() - self.start_wall,
+            't_sim': self.sim_time(),
             'phase': phase,
             'x_ref': ref[0],
             'y_ref': ref[1],
@@ -186,20 +190,60 @@ class OffboardMission:
             row['e_xy'] = row['e_3d'] = None
         self.rows.append(row)
 
+    def sim_time(self):
+        if self.local_position is None:
+            return None
+        value = getattr(self.local_position, 'time_boot_ms', None)
+        return None if value is None else float(value) * 1e-3
+
+    def phase_time(self):
+        if self.args.phase_clock == 'wall':
+            return time.monotonic()
+        return self.sim_time()
+
     def run_phase(self, name, ref, duration, start=None):
         # Com --xy-speed > 0 e um ponto de partida, a referencia caminha de `start` ate `ref`
         # nessa velocidade (tempo de parede) e depois fica parada; sem isso e um degrau.
         period = 1.0 / self.args.rate
-        t0 = time.monotonic()
-        deadline = t0 + duration
+        self.drain_messages()
+        t0 = self.phase_time()
+        if t0 is None:
+            self.mission_failed = True
+            self.failure_reason = f'{name}: simulation clock unavailable'
+            return False
+        wall_start = time.monotonic()
+        last_progress_wall = wall_start
+        last_phase_time = t0
         speed = getattr(self.args, 'xy_speed', 0.0) or 0.0
-        while time.monotonic() < deadline:
+        while True:
             before = time.monotonic()
             self.drain_messages()
+            now = self.phase_time()
+            if now is None:
+                self.mission_failed = True
+                self.failure_reason = f'{name}: simulation clock unavailable'
+                return False
+            phase_elapsed = now - t0
+            if phase_elapsed >= duration:
+                return True
+            if now > last_phase_time + 1e-6:
+                last_phase_time = now
+                last_progress_wall = before
+            if (self.args.phase_clock == 'sim'
+                    and before - last_progress_wall > self.args.sim_stall_timeout):
+                self.mission_failed = True
+                self.failure_reason = (
+                    f'{name}: simulation clock stalled for '
+                    f'{before - last_progress_wall:.1f} wall seconds')
+                return False
+            if before - wall_start > self.args.phase_wall_timeout:
+                self.mission_failed = True
+                self.failure_reason = f'{name}: wall timeout ({self.args.phase_wall_timeout:.1f} s)'
+                return False
             current = ref
             if start is not None and speed > 0.0:
                 dist = ((ref[0] - start[0]) ** 2 + (ref[1] - start[1]) ** 2) ** 0.5
-                frac = min(1.0, speed * (before - t0) / dist) if dist > 0.0 else 1.0
+                frac = min(1.0, speed * phase_elapsed / dist) if dist > 0.0 else 1.0
                 current = (start[0] + frac * (ref[0] - start[0]),
                            start[1] + frac * (ref[1] - start[1]), ref[2], ref[3])
             self.send_setpoint(*current)
@@ -207,6 +251,7 @@ class OffboardMission:
             if self.heartbeat and self.heartbeat.system_status == mavutil.mavlink.MAV_STATE_CRITICAL:
                 self.mission_failed = True
                 self.failure_reason = 'heartbeat system_status CRITICAL'
+                return False
             elapsed = time.monotonic() - before
             time.sleep(max(0.0, period - elapsed))
 
@@ -222,13 +267,18 @@ class OffboardMission:
         home = (initial.x, initial.y, z_target, yaw)
         shifted = (initial.x + self.args.dx, initial.y + self.args.dy, z_target, yaw)
 
-        self.run_phase('prestream', home, self.args.prestream)
+        if not self.run_phase('prestream', home, self.args.prestream):
+            return self.summary()
         self.set_offboard()
-        self.run_phase('offboard_settle', home, self.args.offboard_settle)
+        if not self.run_phase('offboard_settle', home, self.args.offboard_settle):
+            return self.summary()
         self.arm()
-        self.run_phase('climb_hover', home, self.args.takeoff_hover)
-        self.run_phase('translate_out', shifted, self.args.move_hold, start=home)
-        self.run_phase('return_home', home, self.args.return_hold, start=shifted)
+        if not self.run_phase('climb_hover', home, self.args.takeoff_hover):
+            return self.summary()
+        if not self.run_phase('translate_out', shifted, self.args.move_hold, start=home):
+            return self.summary()
+        if not self.run_phase('return_home', home, self.args.return_hold, start=shifted):
+            return self.summary()
         self.land()
         self.run_phase('land_stream', home, self.args.land_stream)
         return self.summary()
@@ -252,6 +302,12 @@ class OffboardMission:
         return {
             'connection': self.args.connection,
             'rate_hz': self.args.rate,
+            'phase_clock': self.args.phase_clock,
+            'sim_time_span_s': (
+                final.get('t_sim') - self.rows[0].get('t_sim')
+                if self.rows and final.get('t_sim') is not None
+                and self.rows[0].get('t_sim') is not None else None
+            ),
             'samples': len(self.rows),
             'failed': self.mission_failed,
             'failure_reason': self.failure_reason,
@@ -296,6 +352,12 @@ def main():
     parser.add_argument('--heartbeat-timeout', type=float, default=30.0)
     parser.add_argument('--position-timeout', type=float, default=30.0)
     parser.add_argument('--rate', type=float, default=20.0)
+    parser.add_argument('--phase-clock', choices=('sim', 'wall'), default='sim',
+                        help='relogio das duracoes de fase; sim evita encurtar missoes com RTF baixo')
+    parser.add_argument('--sim-stall-timeout', type=float, default=15.0,
+                        help='falha se o relogio simulado nao avancar por este tempo de parede')
+    parser.add_argument('--phase-wall-timeout', type=float, default=1200.0,
+                        help='teto de parede por fase, inclusive quando o RTF for muito baixo')
     parser.add_argument('--prestream', type=float, default=2.0)
     parser.add_argument('--offboard-settle', type=float, default=1.0)
     parser.add_argument('--takeoff-hover', type=float, default=12.0)

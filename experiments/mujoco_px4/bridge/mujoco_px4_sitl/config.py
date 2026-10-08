@@ -1,0 +1,311 @@
+"""Configuration for the simulator process.
+
+One dataclass, populated from defaults, then environment variables, then CLI
+flags (later wins). No hardcoded paths outside :data:`DEFAULT_MODEL`.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from .arm import TIMEOUT_ACTIONS
+from .sensors import IMU_MODELS
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_MODEL = _REPO_ROOT / "models" / "x500.xml"
+
+# PX4's traditional SITL home (Zurich). PX4 does not read PX4_HOME_* on the
+# mavlinksim path -- the origin is whatever our first HIL_STATE_QUATERNION
+# carries (plan section 3.6) -- so this value alone defines the local frame.
+DEFAULT_HOME_LAT = 47.397742
+DEFAULT_HOME_LON = 8.545594
+DEFAULT_HOME_ALT = 488.0
+
+
+@dataclass
+class Config:
+    """Everything the simulator needs to run, in SI units."""
+
+    # --- PX4 HIL transport -------------------------------------------------
+    instance: int = 0
+    hil_bind_host: str = "127.0.0.1"
+    hil_port_base: int = 4560
+
+    # --- Rates -------------------------------------------------------------
+    # Must match IMU_INTEG_RATE, which px4-rc.simulator pins to 250 for every
+    # posix simulator (plan section 5).
+    imu_rate_hz: float = 250.0
+    # Physics rate must be an integer multiple of the IMU rate (plan phase 3).
+    physics_rate_hz: float = 1000.0
+    # Simulated seconds per wall second, a ceiling. 0 is unpaced: frames PX4
+    # has answered run as fast as it answers. The fallback before PX4's first
+    # answer is paced at real time then, since nothing else bounds it (plan 3.2).
+    speed_factor: float = 1.0
+
+    # --- Lockstep loop tunables (plan section 3.2) -------------------------
+    # Measured against a live PX4, not guessed. A brake timeout is pure wasted
+    # wall clock under lockstep -- while we block, PX4's clock is frozen, so no
+    # new actuator message can be produced -- hence a short timeout and a lead
+    # large enough to make braking rare. See the table in the plan's 3.2.
+    max_lead_frames: int = 32
+    brake_timeout_s: float = 0.05
+    # Strict regime: how long a frame waits for PX4's answer stamped with its
+    # time, wall clock, before it is counted unproven and the fallback takes
+    # over. Unlike the brake's, this is only spent when PX4 has gone silent, so
+    # it is long enough never to fire under load (probed: p99 about 4 ms with
+    # every core busy).
+    answer_timeout_s: float = 0.2
+    status_interval_s: float = 5.0
+
+    # --- Model -------------------------------------------------------------
+    model_path: Path = field(default_factory=lambda: DEFAULT_MODEL)
+    stub_physics: bool = False
+    # Conversion sidecar supplying the rotor parameters. No default: a model
+    # whose rotor count differs from RotorModel's quad default is rejected at
+    # load, so forgetting this is loud rather than a silent fall back to
+    # placeholder motors. The filled sidecar for the X8 lives in the private
+    # repo alongside its MJCF (AGENTS.md section 4).
+    rotors_path: Path | None = None
+    # IMU errors added to HIL_SENSOR only (sensors.py); "ideal" sends the truth.
+    # The seed fixes the turn-on bias and every frame's draw, so a run repeats.
+    imu_model: str = "icm42688p"
+    imu_seed: int = 0
+
+    # --- Arm command watchdog ----------------------------------------------
+    # How old the arm command in force may get, in *simulated* seconds, before
+    # arm_on_timeout applies. Simulated because it models the arm driver on the
+    # vehicle, whose clock is ours: a lockstep stall must not trip it. 0 turns
+    # the watchdog off, which is the "servo bus with no watchdog" case -- and
+    # what a crashed controller then leaves behind is its last command, forever.
+    arm_timeout_s: float = 0.5
+    # "keep" | "freeze" | "limp"; see arm.TIMEOUT_ACTIONS.
+    arm_on_timeout: str = "freeze"
+
+    # --- Phase 3 open-loop bring-up ----------------------------------------
+    # Pin the vehicle so ground truth moves only in ways we dictate.
+    hold_pose: bool = False
+    hold_height: float = 2.0
+    # MuJoCo-frame attitude to inject, as 321 Euler degrees about body axes.
+    inject_attitude: tuple[float, float, float] | None = None
+
+    # --- Geodetic origin ---------------------------------------------------
+    home_lat: float = DEFAULT_HOME_LAT
+    home_lon: float = DEFAULT_HOME_LON
+    home_alt: float = DEFAULT_HOME_ALT
+
+    # --- Side channel ------------------------------------------------------
+    sidechannel_enabled: bool = True
+    sidechannel_bind_host: str = "127.0.0.1"
+    sidechannel_port_base: int = 14650
+    sidechannel_rate_hz: float = 50.0
+
+    # --- PX4's API link, for an in-process controller (control.py) ---------
+    # PX4's API/offboard MAVLink link: PX4 sends to 14540 + instance
+    # (px4-rc.mavlink). No CLI flags: only an in-process caller reads these.
+    px4_api_port_base: int = 14540
+    # Wall clock to wait for a PING barrier's echo (plan 3.9). Idle an echo
+    # takes 15-35 us; one that does not come is logged and counted, and later
+    # sends go unbarriered until an echo shows PX4's receive thread is back.
+    api_barrier_timeout_s: float = 0.2
+
+    # --- Misc --------------------------------------------------------------
+    viewer: bool = False
+    max_sim_time: float | None = None
+    log_level: str = "INFO"
+
+    @property
+    def hil_port(self) -> int:
+        """PX4 connects to 4560 + instance (px4-rc.mavlinksim)."""
+        return self.hil_port_base + self.instance
+
+    @property
+    def sidechannel_port(self) -> int:
+        return self.sidechannel_port_base + self.instance
+
+    @property
+    def px4_api_port(self) -> int:
+        # px4-rc.mavlink shares 14549 among every instance above 9.
+        return self.px4_api_port_base + min(self.instance, 9)
+
+    @property
+    def imu_dt(self) -> float:
+        return 1.0 / self.imu_rate_hz
+
+    @property
+    def physics_dt(self) -> float:
+        return 1.0 / self.physics_rate_hz
+
+    @property
+    def steps_per_imu_frame(self) -> int:
+        ratio = self.physics_rate_hz / self.imu_rate_hz
+        n = int(round(ratio))
+        if n < 1 or abs(ratio - n) > 1e-9:
+            raise ValueError(
+                f"physics_rate_hz ({self.physics_rate_hz}) must be an integer "
+                f"multiple of imu_rate_hz ({self.imu_rate_hz})"
+            )
+        return n
+
+    def validate(self) -> None:
+        self.steps_per_imu_frame  # raises on a bad rate ratio
+        if self.speed_factor < 0.0:
+            raise ValueError("speed_factor must be >= 0 (0 is unpaced)")
+        if self.max_lead_frames < 1:
+            raise ValueError("max_lead_frames must be >= 1")
+        if self.brake_timeout_s <= 0.0:
+            raise ValueError("brake_timeout_s must be > 0 (wall clock)")
+        if self.answer_timeout_s <= 0.0:
+            raise ValueError("answer_timeout_s must be > 0 (wall clock)")
+        if self.api_barrier_timeout_s <= 0.0:
+            raise ValueError("api_barrier_timeout_s must be > 0 (wall clock)")
+        if self.arm_timeout_s < 0.0:
+            raise ValueError("arm_timeout_s must be >= 0 (0 disables the watchdog)")
+        if self.imu_model not in IMU_MODELS:
+            raise ValueError(f"imu_model {self.imu_model!r} not in {sorted(IMU_MODELS)}")
+        if self.arm_on_timeout not in TIMEOUT_ACTIONS:
+            raise ValueError(
+                f"arm_on_timeout {self.arm_on_timeout!r} not in {TIMEOUT_ACTIONS}"
+            )
+        if self.inject_attitude is not None and not self.hold_pose:
+            # Without the pin, physics integrates the injected attitude away
+            # immediately, so the flag would silently do nothing (plan phase 3
+            # uses the two together).
+            raise ValueError(
+                "--inject-attitude requires --hold-pose: an unpinned vehicle "
+                "integrates the injected attitude away on the first step"
+            )
+        if not self.stub_physics and not Path(self.model_path).is_file():
+            raise FileNotFoundError(f"model not found: {self.model_path}")
+        if self.rotors_path is not None and not Path(self.rotors_path).is_file():
+            raise FileNotFoundError(f"rotors sidecar not found: {self.rotors_path}")
+
+
+def _env_float(name: str, default: float) -> float:
+    raw = os.environ.get(name)
+    if raw is None or raw == "":
+        return default
+    return float(raw)
+
+
+def _env_int(name: str, default: int) -> int:
+    raw = os.environ.get(name)
+    if raw is None or raw == "":
+        return default
+    return int(raw)
+
+
+def _env_path(name: str) -> Path | None:
+    raw = os.environ.get(name)
+    return None if raw is None or raw == "" else Path(raw)
+
+
+def _euler_triple(raw: str) -> tuple[float, float, float]:
+    parts = [p for p in raw.replace(" ", "").split(",") if p]
+    if len(parts) != 3:
+        raise argparse.ArgumentTypeError("expected ROLL,PITCH,YAW in degrees")
+    roll, pitch, yaw = (float(p) for p in parts)
+    return roll, pitch, yaw
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """CLI parser. Defaults come from the environment where one applies."""
+    p = argparse.ArgumentParser(
+        prog="python -m mujoco_px4_sitl",
+        description="MuJoCo physics backend for PX4 SITL (MAVLink HIL, lockstep).",
+    )
+    p.add_argument(
+        "-i", "--instance", type=int, default=_env_int("PX4_INSTANCE", 0),
+        help="PX4 instance; HIL port is 4560+instance (default: %(default)s)",
+    )
+    p.add_argument("--hil-bind-host", default=os.environ.get("MUJOCO_SITL_BIND", "127.0.0.1"))
+    p.add_argument(
+        "--hil-port-base", type=int, default=_env_int("MUJOCO_SITL_HIL_PORT", 4560),
+        help="HIL port is this plus --instance (default: %(default)s)",
+    )
+    p.add_argument(
+        "-m", "--model", dest="model_path", type=Path, default=DEFAULT_MODEL,
+        help="MuJoCo MJCF model (default: %(default)s)",
+    )
+    p.add_argument(
+        "--rotors", dest="rotors_path", type=Path, default=_env_path("MUJOCO_SITL_ROTORS"),
+        help=(
+            "conversion sidecar supplying rotor parameters. Required for any "
+            "model whose rotor count is not 4 (default: $MUJOCO_SITL_ROTORS, "
+            "else vehicle.py's quad placeholders)"
+        ),
+    )
+    p.add_argument(
+        "--imu", dest="imu_model", choices=sorted(IMU_MODELS), default="icm42688p",
+        help=("IMU errors added to HIL_SENSOR, never to ground truth; ideal sends "
+              "the truth (default: %(default)s)"),
+    )
+    p.add_argument("--imu-seed", type=int, default=0,
+                   help="seed of the IMU's turn-on bias and noise (default: %(default)s)")
+    p.add_argument("--imu-rate", dest="imu_rate_hz", type=float, default=250.0,
+                   help="must match IMU_INTEG_RATE (default: %(default)s)")
+    p.add_argument("--physics-rate", dest="physics_rate_hz", type=float, default=1000.0,
+                   help="integer multiple of --imu-rate (default: %(default)s)")
+    p.add_argument("-s", "--speed-factor", type=float, default=1.0,
+                   help=("simulated seconds per wall second, a ceiling; 0 runs as "
+                         "fast as PX4 answers (default: %(default)s)"))
+    p.add_argument("--max-lead-frames", type=int, default=32,
+                   help="IMU frames outstanding before braking (default: %(default)s)")
+    p.add_argument("--brake-timeout", dest="brake_timeout_s", type=float, default=0.05,
+                   help="wall-clock brake timeout in seconds (default: %(default)s)")
+    p.add_argument("--answer-timeout", dest="answer_timeout_s", type=float, default=0.2,
+                   help=("wall-clock seconds a frame waits for PX4's answer before "
+                         "it is counted unproven (default: %(default)s)"))
+    p.add_argument("--status-interval", dest="status_interval_s", type=float, default=5.0,
+                   help="seconds between sim/wall ratio log lines (default: %(default)s)")
+    p.add_argument(
+        "--arm-timeout", dest="arm_timeout_s", type=float, default=0.5,
+        help=(
+            "simulated seconds an arm_cmd stays in force; measured from its "
+            "state_time if it carries one, else from arrival. 0 disables the "
+            "watchdog (default: %(default)s)"
+        ),
+    )
+    p.add_argument(
+        "--arm-on-timeout", dest="arm_on_timeout", choices=TIMEOUT_ACTIONS,
+        default="freeze",
+        help=(
+            "what the arm servos do when arm_cmd goes stale: keep the last "
+            "target, freeze where they are, or go limp (default: %(default)s)"
+        ),
+    )
+    p.add_argument("--stub-physics", action="store_true",
+                   help="phase 1: hardcoded level-hover state, no mj_step")
+    p.add_argument("--hold-pose", action="store_true",
+                   help="phase 3: pin the vehicle in place, ignore actuators")
+    p.add_argument("--hold-height", type=float, default=2.0,
+                   help="height to hold with --hold-pose (default: %(default)s)")
+    p.add_argument(
+        "--inject-attitude", type=_euler_triple, default=None,
+        metavar="ROLL,PITCH,YAW",
+        help="phase 3: hold this MuJoCo-frame attitude, 321 Euler degrees",
+    )
+    p.add_argument("--home-lat", type=float, default=_env_float("PX4_HOME_LAT", DEFAULT_HOME_LAT))
+    p.add_argument("--home-lon", type=float, default=_env_float("PX4_HOME_LON", DEFAULT_HOME_LON))
+    p.add_argument("--home-alt", type=float, default=_env_float("PX4_HOME_ALT", DEFAULT_HOME_ALT))
+    p.add_argument("--no-sidechannel", dest="sidechannel_enabled", action="store_false")
+    p.add_argument(
+        "--sidechannel-port-base", type=int,
+        default=_env_int("MUJOCO_SITL_SIDECHANNEL_PORT", 14650),
+        help="side-channel port is this plus --instance (default: %(default)s)",
+    )
+    p.add_argument("--viewer", action="store_true", help="open the MuJoCo viewer (needs GL)")
+    p.add_argument("--max-sim-time", type=float, default=None,
+                   help="stop after N simulated seconds (testing)")
+    p.add_argument("--log-level", default=os.environ.get("MUJOCO_SITL_LOG", "INFO"))
+    return p
+
+
+def config_from_args(argv: list[str] | None = None) -> Config:
+    args = build_parser().parse_args(argv)
+    known = {f for f in Config.__dataclass_fields__}
+    cfg = Config(**{k: v for k, v in vars(args).items() if k in known})
+    cfg.validate()
+    return cfg

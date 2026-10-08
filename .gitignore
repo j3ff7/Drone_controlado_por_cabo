@@ -5,3 +5,9 @@ __pycache__/
 .codegraph/
 px4/PX4-Autopilot/
 results/
+!experiments/mujoco_px4/results/
+experiments/mujoco_px4/results/*
+!experiments/mujoco_px4/results/README.md
+experiments/mujoco_px4/.venv/
+experiments/mujoco_px4/runtime/
+MUJOCO_LOG.TXT
