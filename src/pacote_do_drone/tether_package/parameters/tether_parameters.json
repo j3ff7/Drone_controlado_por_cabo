@@ -1,6 +1,6 @@
 {
-  "num_links": 50,
-  "length": 0.05,
+  "num_links": 24,
+  "length": 0.08,
   "radius": 0.003,
   "densidade_linear": 0.04,
   "ancora_x": 0,
@@ -10,10 +10,10 @@
   "cabo_fim_y": 0,
   "cabo_fim_z": 1,
   "fixar_ponta": true,
-  "fixacao_x": 2.3,
+  "fixacao_x": 1.7,
   "fixacao_y": 0,
-  "fixacao_z": 0.2,
-  "sag_para_cima": true,
+  "fixacao_z": -0.07,
+  "sag_para_cima": false,
   "damping_junta": 0.002,
   "friction_junta": 0.0,
   "limite_junta_deg": 30

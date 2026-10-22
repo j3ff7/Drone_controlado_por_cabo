@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<sdf version="1.10">
+  <world name="default">
+    <include>
+      <uri>model://sistema_cabeado</uri>
+      <name>x500_cabo</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+  </world>
+</sdf>
