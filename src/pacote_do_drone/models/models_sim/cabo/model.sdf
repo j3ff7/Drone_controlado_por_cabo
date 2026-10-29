@@ -24,7 +24,7 @@
     </link>
 
       <link name="segment_1">
-        <pose>0.000000 0.000000 0.000000 0 0.752874 0.000000</pose>
+        <pose>0.000000 0.000000 0.000000 0 -0.773282 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -88,7 +88,7 @@
       </joint>
   
       <link name="segment_2">
-        <pose>0.058378 0.000000 -0.054699 0 0.717256 0.000000</pose>
+        <pose>0.057250 0.000000 0.055879 0 -0.740055 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -107,7 +107,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0032000000000000015</mass>
+          <mass>0.003199999999999999</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -147,7 +147,7 @@
       </joint>
   
       <link name="segment_3">
-        <pose>0.118667 0.000000 -0.107285 0 0.677980 0.000000</pose>
+        <pose>0.116324 0.000000 0.109825 0 -0.703502 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -166,7 +166,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0032000000000000006</mass>
+          <mass>0.0031999999999999984</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -206,7 +206,7 @@
       </joint>
   
       <link name="segment_4">
-        <pose>0.180974 0.000000 -0.157462 0 0.634591 0.000000</pose>
+        <pose>0.177331 0.000000 0.161577 0 -0.663203 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -225,7 +225,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0031999999999999997</mass>
+          <mass>0.0031999999999999984</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -265,7 +265,7 @@
       </joint>
   
       <link name="segment_5">
-        <pose>0.245400 0.000000 -0.204890 0 0.586611 0.000000</pose>
+        <pose>0.240373 0.000000 0.210828 0 -0.618707 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -284,7 +284,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0031999999999999984</mass>
+          <mass>0.0032000000000000015</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -324,7 +324,7 @@
       </joint>
   
       <link name="segment_6">
-        <pose>0.312025 0.000000 -0.249174 0 0.533565 0.000000</pose>
+        <pose>0.305543 0.000000 0.257227 0 -0.569544 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -343,7 +343,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.003199999999999999</mass>
+          <mass>0.0031999999999999984</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -383,7 +383,7 @@
       </joint>
   
       <link name="segment_7">
-        <pose>0.380905 0.000000 -0.289862 0 0.475028 0.000000</pose>
+        <pose>0.372915 0.000000 0.300367 0 -0.515266 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -402,7 +402,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0032</mass>
+          <mass>0.0032000000000000023</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -442,7 +442,7 @@
       </joint>
   
       <link name="segment_8">
-        <pose>0.452048 0.000000 -0.326451 0 0.410699 0.000000</pose>
+        <pose>0.442528 0.000000 0.339788 0 -0.455489 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -461,7 +461,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.003199999999999998</mass>
+          <mass>0.003200000000000005</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -501,7 +501,7 @@
       </joint>
   
       <link name="segment_9">
-        <pose>0.525395 0.000000 -0.358391 0 0.340492 0.000000</pose>
+        <pose>0.514371 0.000000 0.374980 0 -0.389975 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -520,7 +520,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.003199999999999995</mass>
+          <mass>0.0031999999999999997</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -560,7 +560,7 @@
       </joint>
   
       <link name="segment_10">
-        <pose>0.600802 0.000000 -0.385107 0 0.264650 0.000000</pose>
+        <pose>0.588365 0.000000 0.405393 0 -0.318727 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -619,7 +619,7 @@
       </joint>
   
       <link name="segment_11">
-        <pose>0.678017 0.000000 -0.406033 0 0.183854 0.000000</pose>
+        <pose>0.664336 0.000000 0.430462 0 -0.242101 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -638,7 +638,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0032000000000000015</mass>
+          <mass>0.0031999999999999976</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -678,7 +678,7 @@
       </joint>
   
       <link name="segment_12">
-        <pose>0.756669 0.000000 -0.420659 0 0.099268 0.000000</pose>
+        <pose>0.742003 0.000000 0.449641 0 -0.160889 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -697,7 +697,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0032</mass>
+          <mass>0.0031999999999999984</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -737,7 +737,7 @@
       </joint>
   
       <link name="segment_13">
-        <pose>0.836275 0.000000 -0.428587 0 0.012504 0.000000</pose>
+        <pose>0.820970 0.000000 0.462457 0 -0.076356 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -756,7 +756,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.003200000000000008</mass>
+          <mass>0.003199999999999995</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -796,7 +796,7 @@
       </joint>
   
       <link name="segment_14">
-        <pose>0.916269 0.000000 -0.429587 0 -0.074541 0.000000</pose>
+        <pose>0.900736 0.000000 0.468559 0 0.009839 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -815,7 +815,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0032000000000000006</mass>
+          <mass>0.003199999999999996</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -855,7 +855,7 @@
       </joint>
   
       <link name="segment_15">
-        <pose>0.996046 0.000000 -0.423629 0 -0.159933 0.000000</pose>
+        <pose>0.980733 0.000000 0.467772 0 0.095816 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -874,7 +874,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.003199999999999992</mass>
+          <mass>0.003199999999999994</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -914,7 +914,7 @@
       </joint>
   
       <link name="segment_16">
-        <pose>1.075025 0.000000 -0.410889 0 -0.241956 0.000000</pose>
+        <pose>1.060366 0.000000 0.460119 0 0.179727 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -933,7 +933,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0032000000000000067</mass>
+          <mass>0.0031999999999999936</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -973,7 +973,7 @@
       </joint>
   
       <link name="segment_17">
-        <pose>1.152695 0.000000 -0.391721 0 -0.319308 0.000000</pose>
+        <pose>1.139077 0.000000 0.445818 0 0.259989 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -992,7 +992,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0031999999999999936</mass>
+          <mass>0.0032000000000000028</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1032,7 +1032,7 @@
       </joint>
   
       <link name="segment_18">
-        <pose>1.228651 0.000000 -0.366608 0 -0.391173 0.000000</pose>
+        <pose>1.216388 0.000000 0.425252 0 0.335444 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1051,7 +1051,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0031999999999999967</mass>
+          <mass>0.003199999999999995</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1091,7 +1091,7 @@
       </joint>
   
       <link name="segment_19">
-        <pose>1.302608 0.000000 -0.336106 0 -0.457191 0.000000</pose>
+        <pose>1.291930 0.000000 0.398917 0 0.405403 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1110,7 +1110,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0032</mass>
+          <mass>0.003200000000000006</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1150,7 +1150,7 @@
       </joint>
   
       <link name="segment_20">
-        <pose>1.374392 0.000000 -0.300792 0 -0.517364 0.000000</pose>
+        <pose>1.365445 0.000000 0.367366 0 0.469600 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1169,7 +1169,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.003199999999999999</mass>
+          <mass>0.003200000000000005</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1209,7 +1209,7 @@
       </joint>
   
       <link name="segment_21">
-        <pose>1.443922 0.000000 -0.261225 0 -0.571944 0.000000</pose>
+        <pose>1.436785 0.000000 0.331164 0 0.528098 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1228,7 +1228,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0032000000000000023</mass>
+          <mass>0.0032000000000000015</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1268,7 +1268,7 @@
       </joint>
   
       <link name="segment_22">
-        <pose>1.511190 0.000000 -0.217923 0 -0.621329 0.000000</pose>
+        <pose>1.505886 0.000000 0.290852 0 0.581174 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1287,7 +1287,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0032000000000000097</mass>
+          <mass>0.0032000000000000067</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1327,7 +1327,7 @@
       </joint>
   
       <link name="segment_23">
-        <pose>1.576239 0.000000 -0.171354 0 -0.665985 0.000000</pose>
+        <pose>1.572752 0.000000 0.246932 0 0.629233 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1346,7 +1346,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0032000000000000067</mass>
+          <mass>0.003199999999999998</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1386,7 +1386,7 @@
       </joint>
   
       <link name="segment_24">
-        <pose>1.639143 0.000000 -0.121927 0 -0.706392 0.000000</pose>
+        <pose>1.637430 0.000000 0.199850 0 0.672732 0.000000</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 
@@ -1405,7 +1405,7 @@
 
         <inertial>
           <pose>0.040000 0 0 0 0 0</pose>
-          <mass>0.0032000000002982702</mass>
+          <mass>0.003200000000400337</mass>
           <inertia>
             <ixx>1e-05</ixx><ixy>0</ixy><ixz>0</ixz>
             <iyy>1e-05</iyy><iyz>0</iyz><izz>1e-05</izz>
@@ -1445,7 +1445,7 @@
       </joint>
   
       <link name="ponta_cabo">
-        <pose>1.700000 0.000000 -0.070000 0 0 0</pose>
+        <pose>1.700000 0.000000 0.150000 0 0 0</pose>
         <enable_wind>false</enable_wind>
         <self_collide>false</self_collide>
 

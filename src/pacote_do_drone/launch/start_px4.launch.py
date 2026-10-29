@@ -28,7 +28,7 @@ DRONE_BRIDGE_MODEL_NAME = "x500_cabo"
 DRONE_AIRFRAME_MODEL_NAME = "x500_cabo"
 DRONE_AUTOSTART_ID = "4022"
 ROVER_MODEL_NAME = "rover_mecanum"
-ROVER_BRIDGE_MODEL_NAME = "x500_cabo::rover_mecanum"
+ROVER_BRIDGE_MODEL_NAME = "rover_mecanum_1"
 ROVER_AIRFRAME_MODEL_NAME = "rover_mecanum"
 ROVER_AUTOSTART_ID = "52000"
 
@@ -86,6 +86,7 @@ def montar_script_inicializacao():
 set -euo pipefail
 WORLD=default
 export GZ_SIM_RESOURCE_PATH="{MODELS_SIM_DIR}:{PX4_MODELS_DIR}:${{GZ_SIM_RESOURCE_PATH:-}}"
+export GZ_SIM_SERVER_CONFIG_PATH="{os.path.join(PX4_DIR, 'Tools', 'simulation', 'gz', 'server.config')}"
 SIM_PIDS=()
 
 encerrar_simulacao() {{

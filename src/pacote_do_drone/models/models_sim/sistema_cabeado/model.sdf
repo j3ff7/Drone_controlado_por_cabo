@@ -1,58 +1,27 @@
 <?xml version="1.0"?>
 <sdf version="1.10">
-  <!-- O modelo de primeiro nível mantém o nome x500_cabo esperado pelo PX4.
-       Drone e cabo são fundidos a este modelo; o rover permanece aninhado. -->
   <model name="x500_cabo">
     <static>false</static>
 
+    <!-- Drone -->
     <include merge="true">
       <uri>model://x500</uri>
     </include>
 
+    <!-- Cabo -->
     <include merge="true">
       <uri>model://cabo</uri>
       <pose>0 0 0.24 0 0 0</pose>
     </include>
 
-    <include>
-      <uri>model://rover_mecanum</uri>
-      <name>rover_mecanum</name>
-      <pose>1.7 0 0 0 0 0</pose>
-    </include>
-
+    <!-- Conexão entre o drone e o cabo -->
     <joint name="drone_cabo_joint" type="ball">
       <parent>base_link</parent>
       <child>raiz_cabo</child>
     </joint>
 
-    <!-- O topo do chassi fica em z=0,05 m relativo ao base_link.
-         A junta fica 0,02 m acima do topo para evitar contato com a carcaça. -->
-    <joint name="cabo_rover_joint" type="universal">
-      <pose relative_to="rover_mecanum::base_link">0 0 0.1 0 0 0</pose>
-      <parent>ponta_cabo</parent>
-      <child>rover_mecanum::base_link</child>
-      <axis>
-        <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        <dynamics>
-          <damping>0.002</damping>
-          <friction>0</friction>
-        </dynamics>
-      </axis>
-      <axis2>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-        <dynamics>
-          <damping>0.002</damping>
-          <friction>0</friction>
-        </dynamics>
-      </axis2>
-    </joint>
+    <plugin
+      filename="gz-sim-forcetorque-system"
+      name="gz::sim::systems::ForceTorque"/>
   </model>
 </sdf>

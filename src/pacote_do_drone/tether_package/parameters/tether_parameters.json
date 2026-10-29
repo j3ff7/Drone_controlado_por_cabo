@@ -12,8 +12,8 @@
   "fixar_ponta": true,
   "fixacao_x": 1.7,
   "fixacao_y": 0,
-  "fixacao_z": -0.07,
-  "sag_para_cima": false,
+  "fixacao_z": 0.15,
+  "sag_para_cima": true,
   "damping_junta": 0.002,
   "friction_junta": 0.0,
   "limite_junta_deg": 30
