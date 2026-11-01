@@ -50,43 +50,19 @@
           </inertia>
         </inertial>
       </link>
-
-      <joint name="joint_1" type="universal">
+    
+      <joint name="joint_1" type="ball">
         <parent>raiz_cabo</parent>
         <child>segment_1</child>
         <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-          
-          <dynamics>
-            <damping>0.002</damping>
-            <friction>0.0</friction>
-          </dynamics>
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.523599</lower>
-          <upper>0.523599</upper>
-        </limit>
-          
-          <dynamics>
-            <damping>0.002</damping>
-            <friction>0.0</friction>
-          </dynamics>
-        </axis2>
-    
+        
       <sensor name="sensor_tensao_ancora" type="force_torque">
         <always_on>true</always_on>
         <update_rate>50</update_rate>
         <topic>/cabo/tensao_ancora</topic>
       </sensor>
       </joint>
-  
+
       <link name="segment_2">
         <pose>0.057250 0.000000 0.055879 0 -0.740055 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -114,7 +90,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_2" type="universal">
         <parent>segment_1</parent>
         <child>segment_2</child>
@@ -143,9 +119,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_3">
         <pose>0.116324 0.000000 0.109825 0 -0.703502 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -173,7 +149,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_3" type="universal">
         <parent>segment_2</parent>
         <child>segment_3</child>
@@ -202,9 +178,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_4">
         <pose>0.177331 0.000000 0.161577 0 -0.663203 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -232,7 +208,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_4" type="universal">
         <parent>segment_3</parent>
         <child>segment_4</child>
@@ -261,9 +237,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_5">
         <pose>0.240373 0.000000 0.210828 0 -0.618707 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -291,7 +267,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_5" type="universal">
         <parent>segment_4</parent>
         <child>segment_5</child>
@@ -320,9 +296,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_6">
         <pose>0.305543 0.000000 0.257227 0 -0.569544 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -350,7 +326,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_6" type="universal">
         <parent>segment_5</parent>
         <child>segment_6</child>
@@ -379,9 +355,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_7">
         <pose>0.372915 0.000000 0.300367 0 -0.515266 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -409,7 +385,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_7" type="universal">
         <parent>segment_6</parent>
         <child>segment_7</child>
@@ -438,9 +414,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_8">
         <pose>0.442528 0.000000 0.339788 0 -0.455489 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -468,7 +444,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_8" type="universal">
         <parent>segment_7</parent>
         <child>segment_8</child>
@@ -497,9 +473,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_9">
         <pose>0.514371 0.000000 0.374980 0 -0.389975 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -527,7 +503,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_9" type="universal">
         <parent>segment_8</parent>
         <child>segment_9</child>
@@ -556,9 +532,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_10">
         <pose>0.588365 0.000000 0.405393 0 -0.318727 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -586,7 +562,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_10" type="universal">
         <parent>segment_9</parent>
         <child>segment_10</child>
@@ -615,9 +591,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_11">
         <pose>0.664336 0.000000 0.430462 0 -0.242101 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -645,7 +621,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_11" type="universal">
         <parent>segment_10</parent>
         <child>segment_11</child>
@@ -674,9 +650,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_12">
         <pose>0.742003 0.000000 0.449641 0 -0.160889 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -704,7 +680,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_12" type="universal">
         <parent>segment_11</parent>
         <child>segment_12</child>
@@ -733,9 +709,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_13">
         <pose>0.820970 0.000000 0.462457 0 -0.076356 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -763,7 +739,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_13" type="universal">
         <parent>segment_12</parent>
         <child>segment_13</child>
@@ -792,9 +768,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_14">
         <pose>0.900736 0.000000 0.468559 0 0.009839 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -822,7 +798,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_14" type="universal">
         <parent>segment_13</parent>
         <child>segment_14</child>
@@ -851,9 +827,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_15">
         <pose>0.980733 0.000000 0.467772 0 0.095816 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -881,7 +857,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_15" type="universal">
         <parent>segment_14</parent>
         <child>segment_15</child>
@@ -910,9 +886,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_16">
         <pose>1.060366 0.000000 0.460119 0 0.179727 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -940,7 +916,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_16" type="universal">
         <parent>segment_15</parent>
         <child>segment_16</child>
@@ -969,9 +945,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_17">
         <pose>1.139077 0.000000 0.445818 0 0.259989 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -999,7 +975,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_17" type="universal">
         <parent>segment_16</parent>
         <child>segment_17</child>
@@ -1028,9 +1004,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_18">
         <pose>1.216388 0.000000 0.425252 0 0.335444 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -1058,7 +1034,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_18" type="universal">
         <parent>segment_17</parent>
         <child>segment_18</child>
@@ -1087,9 +1063,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_19">
         <pose>1.291930 0.000000 0.398917 0 0.405403 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -1117,7 +1093,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_19" type="universal">
         <parent>segment_18</parent>
         <child>segment_19</child>
@@ -1146,9 +1122,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_20">
         <pose>1.365445 0.000000 0.367366 0 0.469600 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -1176,7 +1152,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_20" type="universal">
         <parent>segment_19</parent>
         <child>segment_20</child>
@@ -1205,9 +1181,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_21">
         <pose>1.436785 0.000000 0.331164 0 0.528098 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -1235,7 +1211,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_21" type="universal">
         <parent>segment_20</parent>
         <child>segment_21</child>
@@ -1264,9 +1240,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_22">
         <pose>1.505886 0.000000 0.290852 0 0.581174 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -1294,7 +1270,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_22" type="universal">
         <parent>segment_21</parent>
         <child>segment_22</child>
@@ -1323,9 +1299,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_23">
         <pose>1.572752 0.000000 0.246932 0 0.629233 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -1353,7 +1329,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_23" type="universal">
         <parent>segment_22</parent>
         <child>segment_23</child>
@@ -1382,9 +1358,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="segment_24">
         <pose>1.637430 0.000000 0.199850 0 0.672732 0.000000</pose>
         <enable_wind>false</enable_wind>
@@ -1412,7 +1388,7 @@
           </inertia>
         </inertial>
       </link>
-
+    
       <joint name="joint_24" type="universal">
         <parent>segment_23</parent>
         <child>segment_24</child>
@@ -1441,9 +1417,9 @@
             <friction>0.0</friction>
           </dynamics>
         </axis2>
-    
+        
       </joint>
-  
+
       <link name="ponta_cabo">
         <pose>1.700000 0.000000 0.150000 0 0 0</pose>
         <enable_wind>false</enable_wind>

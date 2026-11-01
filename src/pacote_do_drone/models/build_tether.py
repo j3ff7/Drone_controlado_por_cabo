@@ -280,6 +280,36 @@ for i in range(1, num_links + 1):
         <topic>/cabo/tensao_ancora</topic>
       </sensor>"""
 
+    # A primeira junta da cadeia é esférica (3 graus de liberdade).
+    # As demais continuam universais, preservando os limites e a dinâmica
+    # definidos pelos parâmetros.
+    if i == 1:
+        junta_xml = f"""
+      <joint name="joint_{i}" type="ball">
+        <parent>{parent_link}</parent>
+        <child>{nome_elo}</child>
+        <pose>0 0 0 0 0 0</pose>
+        {sensor_xml}
+      </joint>
+"""
+    else:
+        junta_xml = f"""
+      <joint name="joint_{i}" type="universal">
+        <parent>{parent_link}</parent>
+        <child>{nome_elo}</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>{limite_xml}
+          {dynamics_xml}
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>{limite_xml}
+          {dynamics_xml}
+        </axis2>
+        {sensor_xml}
+      </joint>
+"""
+
     sdf += f"""
       <link name="{nome_elo}">
         <pose>{pose_x:.6f} {pose_y:.6f} {pose_z:.6f} 0 {pitch:.6f} {yaw:.6f}</pose>
@@ -308,22 +338,8 @@ for i in range(1, num_links + 1):
           </inertia>
         </inertial>
       </link>
-
-      <joint name="joint_{i}" type="universal">
-        <parent>{parent_link}</parent>
-        <child>{nome_elo}</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>0 1 0</xyz>{limite_xml}
-          {dynamics_xml}
-        </axis>
-        <axis2>
-          <xyz>0 0 1</xyz>{limite_xml}
-          {dynamics_xml}
-        </axis2>
-    {sensor_xml}
-      </joint>
-  """
+    """
+    sdf += junta_xml
     parent_link = nome_elo
 
 # ---- elo extra: só a esfera na ponta ----

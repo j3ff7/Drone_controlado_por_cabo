@@ -10,7 +10,7 @@
       <pose>0 0 0.24 0 0 0</pose>
     </include>
 
-    <joint name="drone_cabo_joint" type="ball">
+    <joint name="drone_cabo_joint" type="fixed">
       <parent>base_link</parent>
       <child>raiz_cabo</child>
     </joint>
