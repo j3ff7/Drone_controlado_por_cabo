@@ -19,7 +19,7 @@
     <!-- Conexão entre a ponta do cabo e o rover -->
     <joint name="cabo_rover_joint" type="universal">
       <pose relative_to="rover_mecanum_1::base_link">
-        0 0 0.15 0 0 0
+        0 0 0.24 0 0 0
       </pose>
 
       <parent>x500_cabo::ponta_cabo</parent>

@@ -11,11 +11,11 @@
     <!-- Cabo -->
     <include merge="true">
       <uri>model://cabo</uri>
-      <pose>0 0 0.24 0 0 0</pose>
+      <pose>0 0 0.2 0 0 0</pose>
     </include>
 
     <!-- Conexão entre o drone e o cabo -->
-    <joint name="drone_cabo_joint" type="ball">
+    <joint name="drone_cabo_joint" type="fixed">
       <parent>base_link</parent>
       <child>raiz_cabo</child>
     </joint>
