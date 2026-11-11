@@ -44,6 +44,8 @@ setup(
         'console_scripts': [
             'sensores = pacote_do_drone.sensores:main',
             'mission_test1 = pacote_do_drone.mission_test1:main',
+            'coletor_validacao = pacote_do_drone.coletor_validacao:main',
+            'validar_telemetria = pacote_do_drone.validar_telemetria:main',
         ],
     },
 )

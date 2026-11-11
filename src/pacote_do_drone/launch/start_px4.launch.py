@@ -231,7 +231,12 @@ echo "=========================================="
 
 source /opt/ros/jazzy/setup.bash
 
-WORLD=default
+# O VS Code instalado via Snap injeta bibliotecas incompatíveis com os
+# executáveis nativos do Gazebo e do GNOME Terminal.
+unset SNAP SNAP_NAME SNAP_INSTANCE SNAP_COMMON SNAP_DATA SNAP_USER_DATA \\
+  SNAP_USER_COMMON SNAP_REVISION SNAP_ARCH SNAP_LIBRARY_PATH
+
+export WORLD=default
 
 
 # --------------------------------------------------
@@ -322,10 +327,12 @@ esperar_mundo
 # Ponte Gazebo -> ROS 2
 # --------------------------------------------------
 
-echo "[start_px4] Iniciando ponte das poses Gazebo -> ROS 2..."
+echo "[start_px4] Iniciando ponte de poses e tensoes Gazebo -> ROS 2..."
 
-ros2 run ros_gz_bridge parameter_bridge \\
-  /world/default/pose/info@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V &
+ros2 run ros_gz_bridge parameter_bridge \
+  /world/default/pose/info@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V \
+  /cabo/tensao_ancora@geometry_msgs/msg/WrenchStamped[gz.msgs.Wrench \
+  /cabo/tensao_ponta@geometry_msgs/msg/WrenchStamped[gz.msgs.Wrench &
 
 PID_BRIDGE=$!
 
@@ -333,7 +340,7 @@ SIM_PIDS+=("$PID_BRIDGE")
 
 sleep 2
 
-echo "[start_px4] Ponte das poses iniciada."
+echo "[start_px4] Ponte de poses e tensoes iniciada."
 
 
 # --------------------------------------------------
@@ -342,20 +349,19 @@ echo "[start_px4] Ponte das poses iniciada."
 
 cd "{PX4_DIR}"
 
-echo "[start_px4] Iniciando PX4 do drone..."
+echo "[start_px4] Abrindo terminal do PX4 - drone..."
 
-(
-  # Redireciona a saída do drone para um arquivo próprio
-  exec >> /tmp/px4_drone.log 2>&1
-
-  export PX4_GZ_STANDALONE=1
-  export PX4_GZ_WORLD="$WORLD"
-  export PX4_GZ_MODEL_NAME="{DRONE_BRIDGE_MODEL_NAME}"
-  export PX4_SYS_AUTOSTART={DRONE_AUTOSTART_ID}
-
-  exec "{PX4_BIN}" -i 0
-
-) &
+gnome-terminal \
+  --wait \
+  --title="PX4 - Drone" \
+  -- \
+  bash -lc \
+  'cd "{PX4_DIR}"
+   export PX4_GZ_STANDALONE=1
+   export PX4_GZ_WORLD="$WORLD"
+   export PX4_GZ_MODEL_NAME="{DRONE_BRIDGE_MODEL_NAME}"
+   export PX4_SYS_AUTOSTART={DRONE_AUTOSTART_ID}
+   exec "{PX4_BIN}" -i 0' &
 
 PID_DRONE=$!
 
@@ -364,20 +370,19 @@ PID_DRONE=$!
 # Inicialização do PX4 - Rover
 # --------------------------------------------------
 
-echo "[start_px4] Iniciando PX4 do rover..."
+echo "[start_px4] Abrindo terminal do PX4 - rover..."
 
-(
-  # Redireciona a saída do rover para um arquivo próprio
-  exec >> /tmp/px4_rover.log 2>&1
-
-  export PX4_GZ_STANDALONE=1
-  export PX4_GZ_WORLD="$WORLD"
-  export PX4_GZ_MODEL_NAME="{ROVER_BRIDGE_MODEL_NAME}"
-  export PX4_SYS_AUTOSTART={ROVER_AUTOSTART_ID}
-
-  exec "{PX4_BIN}" -i 1
-
-) &
+gnome-terminal \
+  --wait \
+  --title="PX4 - Rover" \
+  -- \
+  bash -lc \
+  'cd "{PX4_DIR}"
+   export PX4_GZ_STANDALONE=1
+   export PX4_GZ_WORLD="$WORLD"
+   export PX4_GZ_MODEL_NAME="{ROVER_BRIDGE_MODEL_NAME}"
+   export PX4_SYS_AUTOSTART={ROVER_AUTOSTART_ID}
+   exec "{PX4_BIN}" -i 1' &
 
 PID_ROVER=$!
 
@@ -610,10 +615,6 @@ def preparar_e_iniciar(context, *args, **kwargs):
         ExecuteProcess(
 
             cmd=[
-                "gnome-terminal",
-                "--wait",
-                "--title=Simulação PX4 cabeada",
-                "--",
                 "bash",
                 "-lc",
                 script_simulacao,

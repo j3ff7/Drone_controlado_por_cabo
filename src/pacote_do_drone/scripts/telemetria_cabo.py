@@ -21,9 +21,9 @@ class TelemetriaCabo(Node):
         # CONFIGURAÇÃO
         # ==================================================
 
-        # Índices das poses identificados no teste anterior
-        self.IDX_RAIZ = 9
-        self.IDX_SEGMENTO_1 = 10
+        # Nomes dos frames do cabo. O prefixo do modelo pode variar no Gazebo.
+        self.FRAME_RAIZ = 'raiz_cabo'
+        self.FRAME_SEGMENTO_1 = 'segment_1'
 
         # Nome da junta na ponta do cabo
         self.JUNTA_PONTA = 'joint_ponta'
@@ -117,17 +117,38 @@ class TelemetriaCabo(Node):
     # CALLBACK DAS POSES
     # ======================================================
 
+    def encontrar_transform(self, transforms, frame_name):
+
+        for transform in transforms:
+            child_frame = transform.child_frame_id
+
+            if (
+                child_frame == frame_name
+                or child_frame.endswith(f'::{frame_name}')
+                or child_frame.endswith(f'/{frame_name}')
+            ):
+                return transform
+
+        return None
+
     def callback_poses(self, msg):
 
         transforms = msg.transforms
 
-        if len(transforms) <= self.IDX_SEGMENTO_1:
+        transform_raiz = self.encontrar_transform(
+            transforms,
+            self.FRAME_RAIZ
+        )
+        transform_segmento = self.encontrar_transform(
+            transforms,
+            self.FRAME_SEGMENTO_1
+        )
+
+        if transform_raiz is None or transform_segmento is None:
             return
 
         # Orientação da raiz do cabo
-        rot_raiz = transforms[
-            self.IDX_RAIZ
-        ].transform.rotation
+        rot_raiz = transform_raiz.transform.rotation
 
         q_raiz = (
             rot_raiz.x,
@@ -137,9 +158,7 @@ class TelemetriaCabo(Node):
         )
 
         # Orientação do primeiro segmento
-        rot_segmento = transforms[
-            self.IDX_SEGMENTO_1
-        ].transform.rotation
+        rot_segmento = transform_segmento.transform.rotation
 
         q_segmento = (
             rot_segmento.x,

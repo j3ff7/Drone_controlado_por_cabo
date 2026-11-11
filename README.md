@@ -407,7 +407,54 @@ Os modelos também são sincronizados com:
 
 onde ficam disponíveis para a execução do PX4.
 
-🧠 8. Executar o controlador ROS 2
+📊 8. Coleta e validação da telemetria
+
+Após iniciar a simulação, compile e carregue o pacote:
+
+```bash
+cd ~/Drone_controlado_por_cabo
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+```
+
+Inicie o coletor em um terminal separado:
+
+```bash
+ros2 run pacote_do_drone coletor_validacao
+```
+
+Ao pressionar `Ctrl+C`, a coleta é salva em um arquivo numerado:
+
+```text
+results/validation/telemetria_001.csv
+results/validation/telemetria_002.csv
+...
+```
+
+O arquivo `results/validation/telemetria.csv` também é atualizado com a coleta mais recente. As coletas numeradas não são sobrescritas.
+
+Para validar a coleta mais recente, execute diretamente o arquivo no VS Code ou use:
+
+```bash
+python3 src/pacote_do_drone/pacote_do_drone/validar_telemetria.py
+```
+
+A validação lê automaticamente a telemetria numerada mais recente e cria um resultado numerado em:
+
+```text
+results/validation/validacao_teorica_001.csv
+results/validation/validacao_teorica_002.csv
+...
+```
+
+O mesmo arquivo de validação é reutilizado enquanto o CSV de entrada não mudar. Uma nova numeração só é criada após uma nova coleta. Para validar um arquivo específico:
+
+```bash
+python3 src/pacote_do_drone/pacote_do_drone/validar_telemetria.py \
+  results/validation/telemetria_001.csv
+```
+
+🧠 9. Executar o controlador ROS 2
 
 Após iniciar a simulação, os nós desenvolvidos em ROS 2 podem ser executados separadamente.
 
